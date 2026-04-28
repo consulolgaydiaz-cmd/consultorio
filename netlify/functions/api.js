@@ -1,4 +1,3 @@
-const fetch = require('node-fetch');
 
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx9QlKlw4bd75YSHjv6CKoyGsRE-q9e0VLsMOzr6lbXncYauDccXoCqlqj8-cKUVBf2xg/exec';
 
