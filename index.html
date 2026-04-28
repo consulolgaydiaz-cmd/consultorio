@@ -583,13 +583,21 @@
       <div style="display:flex;flex-direction:column;width:100%;height:100%;">
         <div class="agenda-header">
           <div>
-            <div class="agenda-title">Agenda de hoy</div>
+            <div class="agenda-title">Agenda</div>
             <div class="agenda-sub" id="agendaSub">Cargando turnos...</div>
           </div>
-          <div class="stats">
-            <div class="stat"><div class="stat-n" id="statTotal">—</div><div class="stat-l">Total</div></div>
-            <div class="stat"><div class="stat-n" id="statPend">—</div><div class="stat-l">Pendientes</div></div>
-            <div class="stat"><div class="stat-n" id="statAt">—</div><div class="stat-l">Atendidos</div></div>
+          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+            <div style="display:flex;align-items:center;gap:4px;background:var(--surface2);border-radius:8px;padding:3px 6px;">
+              <button onclick="cambiarFecha(-1)" style="border:none;background:transparent;cursor:pointer;padding:4px 8px;font-size:18px;color:var(--accent);line-height:1;">‹</button>
+              <input type="date" id="fechaAgenda" style="border:none;background:transparent;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;color:var(--text);outline:none;cursor:pointer;padding:4px;" onchange="loadAgenda()">
+              <button onclick="cambiarFecha(1)" style="border:none;background:transparent;cursor:pointer;padding:4px 8px;font-size:18px;color:var(--accent);line-height:1;">›</button>
+            </div>
+            <button onclick="irAHoy()" style="padding:6px 12px;font-size:12px;font-family:'DM Sans',sans-serif;font-weight:500;background:var(--accent-light);color:var(--accent);border:none;border-radius:6px;cursor:pointer;">Hoy</button>
+            <div class="stats">
+              <div class="stat"><div class="stat-n" id="statTotal">—</div><div class="stat-l">Total</div></div>
+              <div class="stat"><div class="stat-n" id="statPend">—</div><div class="stat-l">Pendientes</div></div>
+              <div class="stat"><div class="stat-n" id="statAt">—</div><div class="stat-l">Atendidos</div></div>
+            </div>
           </div>
         </div>
         <div class="agenda-list" id="agendaList">
@@ -646,51 +654,67 @@
 
 <script>
 const SCRIPT_URL = 'https://delicate-manatee-ad6210.netlify.app/.netlify/functions/api';
+
 let allPatients = [];
 let filteredPatients = [];
 let selectedPatient = null;
 
 // ─── CIE-10 básico (ampliable) ───────────────────────────────
 const CIE10 = [
-  {code:'A09',desc:'Diarrea y gastroenteritis de presunto origen infeccioso'},
-  {code:'B34.9',desc:'Infección viral, no especificada'},
+  // DIABETES
   {code:'E10',desc:'Diabetes mellitus tipo 1'},
   {code:'E11',desc:'Diabetes mellitus tipo 2'},
-  {code:'E14',desc:'Diabetes mellitus, no especificada'},
+  {code:'E11.9',desc:'Diabetes mellitus tipo 2 sin complicaciones'},
+  {code:'E11.65',desc:'Diabetes mellitus tipo 2 con hiperglucemia'},
+  {code:'E11.40',desc:'Diabetes mellitus tipo 2 con neuropatía diabética'},
+  {code:'E13',desc:'Otras diabetes mellitus especificadas'},
+  {code:'E14',desc:'Diabetes mellitus no especificada'},
+  {code:'O24',desc:'Diabetes mellitus gestacional'},
+  // TIROIDES
+  {code:'E00',desc:'Síndrome de deficiencia de yodo'},
+  {code:'E01',desc:'Trastornos tiroideos por deficiencia de yodo'},
+  {code:'E02',desc:'Hipotiroidismo subclínico por deficiencia de yodo'},
+  {code:'E03',desc:'Hipotiroidismo'},
+  {code:'E03.9',desc:'Hipotiroidismo no especificado'},
+  {code:'E04',desc:'Bocio no tóxico'},
+  {code:'E04.2',desc:'Bocio multinodular no tóxico'},
+  {code:'E05',desc:'Tirotoxicosis / Hipertiroidismo'},
+  {code:'E05.2',desc:'Bocio multinodular tóxico'},
+  {code:'E06',desc:'Tiroiditis'},
+  {code:'E06.3',desc:'Tiroiditis autoinmune (Hashimoto)'},
+  {code:'C73',desc:'Carcinoma papilar de tiroides'},
+  {code:'D34',desc:'Tumor benigno de tiroides'},
+  {code:'D44.0',desc:'Tumor de comportamiento incierto de tiroides'},
+  // SUPRARRENALES
+  {code:'D44.1',desc:'Incidentaloma suprarrenal / Tumor de comportamiento incierto de suprarrenal'},
+  {code:'E24',desc:'Síndrome de Cushing'},
+  {code:'E25',desc:'Trastornos adrenogenitales'},
+  {code:'E26',desc:'Hiperaldosteronismo'},
+  {code:'E27',desc:'Otros trastornos suprarrenales'},
+  // HIPÓFISIS
+  {code:'E22',desc:'Hiperfunción hipofisaria'},
+  {code:'E22.0',desc:'Acromegalia'},
+  {code:'E22.1',desc:'Hiperprolactinemia'},
+  {code:'E23',desc:'Hipofunción hipofisaria'},
+  {code:'E23.0',desc:'Hipopituitarismo'},
+  // GÓNADAS
+  {code:'E28',desc:'Disfunción ovárica'},
+  {code:'E29',desc:'Disfunción testicular'},
+  {code:'E34.9',desc:'Trastorno endocrino no especificado'},
+  // METABOLISMO
   {code:'E66',desc:'Obesidad'},
-  {code:'E78',desc:'Trastornos del metabolismo de las lipoproteínas'},
-  {code:'F32',desc:'Episodio depresivo'},
-  {code:'F41.1',desc:'Trastorno de ansiedad generalizada'},
-  {code:'G43',desc:'Migraña'},
-  {code:'G44',desc:'Otros síndromes de cefalea'},
-  {code:'H10',desc:'Conjuntivitis'},
-  {code:'I10',desc:'Hipertensión esencial'},
-  {code:'I25',desc:'Enfermedad isquémica crónica del corazón'},
-  {code:'J00',desc:'Rinofaringitis aguda (resfriado común)'},
-  {code:'J03',desc:'Amigdalitis aguda'},
-  {code:'J06',desc:'Infecciones agudas de vías respiratorias superiores'},
-  {code:'J18',desc:'Neumonía, no especificada'},
-  {code:'J20',desc:'Bronquitis aguda'},
-  {code:'J45',desc:'Asma'},
-  {code:'K21',desc:'Enfermedad por reflujo gastroesofágico'},
-  {code:'K29',desc:'Gastritis y duodenitis'},
-  {code:'K57',desc:'Enfermedad diverticular del intestino'},
-  {code:'K92',desc:'Otras enfermedades del aparato digestivo'},
-  {code:'L20',desc:'Dermatitis atópica'},
-  {code:'L30',desc:'Otras dermatitis'},
-  {code:'M10',desc:'Gota'},
-  {code:'M54.5',desc:'Lumbago'},
-  {code:'M79.1',desc:'Mialgia'},
-  {code:'N30',desc:'Cistitis'},
-  {code:'N39.0',desc:'Infección de vías urinarias, sitio no especificado'},
-  {code:'R05',desc:'Tos'},
-  {code:'R10',desc:'Dolor abdominal y pélvico'},
-  {code:'R51',desc:'Cefalea'},
-  {code:'R50',desc:'Fiebre de otro origen y de origen desconocido'},
-  {code:'R55',desc:'Síncope y colapso'},
-  {code:'Z00',desc:'Examen general e investigación de personas sin quejas'},
-  {code:'Z30',desc:'Atención para la anticoncepción'},
-  {code:'Z34',desc:'Supervisión de embarazo normal'},
+  {code:'E66.0',desc:'Obesidad por exceso de calorías'},
+  {code:'E78',desc:'Trastornos del metabolismo de lipoproteínas'},
+  {code:'E78.0',desc:'Hipercolesterolemia pura'},
+  {code:'E78.1',desc:'Hipertrigliceridemia pura'},
+  {code:'E78.5',desc:'Hiperlipidemia mixta'},
+  {code:'E79',desc:'Trastornos del metabolismo de purinas y pirimidinas'},
+  {code:'E83',desc:'Trastornos del metabolismo de minerales'},
+  {code:'E83.5',desc:'Trastornos del metabolismo del calcio'},
+  // CONTROLES
+  {code:'Z00',desc:'Control general'},
+  {code:'Z13',desc:'Pesquisa de enfermedades endócrinas'},
+  {code:'Z83',desc:'Antecedentes familiares de enfermedades endócrinas'},
 ];
 
 // ─── Utils ───────────────────────────────────────────────────
@@ -727,10 +751,31 @@ function callScript(params) {
 }
 
 // ─── AGENDA ──────────────────────────────────────────────────
+function getTodayStr() {
+  const hoy = new Date();
+  return hoy.toISOString().slice(0,10);
+}
+
+function irAHoy() {
+  document.getElementById('fechaAgenda').value = getTodayStr();
+  loadAgenda();
+}
+
+function cambiarFecha(dias) {
+  const input = document.getElementById('fechaAgenda');
+  const fecha = new Date(input.value + 'T12:00:00');
+  fecha.setDate(fecha.getDate() + dias);
+  input.value = fecha.toISOString().slice(0,10);
+  loadAgenda();
+}
+
 function loadAgenda() {
-  callScript({action:'getTurnosHoy'}).then(data => {
+  const input = document.getElementById('fechaAgenda');
+  const fecha = input.value || getTodayStr();
+  document.getElementById('agendaList').innerHTML = '<div class="loading-msg">⏳ Cargando...</div>';
+  callScript({action:'getTurnosPorFecha', fecha: fecha}).then(data => {
     const turnos = Array.isArray(data) ? data : [];
-    renderAgenda(turnos);
+    renderAgenda(turnos, fecha);
   }).catch(() => {
     document.getElementById('agendaList').innerHTML = '<div class="loading-msg">⚠️ Error al cargar la agenda. Revisá la conexión.</div>';
   });
@@ -742,7 +787,7 @@ function renderAgenda(turnos) {
   const atendidos = turnos.filter(t => t.estado && t.estado.toUpperCase() === 'ATTENDED').length;
   const pendientes = total - atendidos;
 
-  document.getElementById('agendaSub').textContent = total ? `${total} turnos programados` : 'Sin turnos para hoy';
+  document.getElementById('agendaSub').textContent = total ? `${total} turnos programados` : 'Sin turnos para este día';
   document.getElementById('statTotal').textContent = total;
   document.getElementById('statPend').textContent = pendientes;
   document.getElementById('statAt').textContent = atendidos;
@@ -1045,6 +1090,7 @@ function showScreen(name) {
 
 // ─── INIT ─────────────────────────────────────────────────────
 setTopbar();
+document.getElementById('fechaAgenda').value = getTodayStr();
 loadAgenda();
 </script>
 </body>
