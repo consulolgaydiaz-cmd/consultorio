@@ -569,7 +569,7 @@
 
 <div class="app">
   <div class="topbar">
-    <div class="logo">Consultorio Dra. Olga Yolanda Díaz - Endocrinología <span id="topDate"></span></div>
+    <div class="logo">Consultorio <span id="topDate"></span></div>
     <div class="nav">
       <button class="nav-btn active" id="navAgenda" onclick="showScreen('agenda')">Agenda</button>
       <button class="nav-btn" id="navPacientes" onclick="showScreen('pacientes')">Pacientes</button>
@@ -640,6 +640,7 @@
           </div>
           <div class="content">
             <div class="info-grid" id="fichaGrid"></div>
+          <div id="antecedentesBox"></div>
             <div id="resumenBox"></div>
             <div class="section-label">Historial de consultas</div>
             <div id="consultasBox"></div>
@@ -719,6 +720,21 @@ const CIE10 = [
 
 // ─── Utils ───────────────────────────────────────────────────
 function initials(n) { return n.split(' ').filter(Boolean).map(w=>w[0]).join('').slice(0,2).toUpperCase(); }
+
+function formatFecha(f) {
+  if (!f) return '—';
+  // Si ya está en formato DD/MM/AAAA lo devuelve tal cual
+  if (/^\d{2}\/\d{2}\/\d{4}$/.test(String(f))) return f;
+  // Si es ISO o cualquier otro formato parseable
+  try {
+    const d = new Date(f);
+    if (isNaN(d.getTime())) return String(f);
+    const dd = String(d.getUTCDate()).padStart(2,'0');
+    const mm = String(d.getUTCMonth()+1).padStart(2,'0');
+    const yy = d.getUTCFullYear();
+    return `${dd}/${mm}/${yy}`;
+  } catch(e) { return String(f); }
+}
 
 function calcEdad(fn) {
   if (!fn) return '—';
@@ -901,12 +917,22 @@ function selectPatient(p) {
     </div>
     <div class="info-card">
       <div class="info-label">Fecha de nacimiento</div>
-      <div class="info-value">${p.fechaNacimiento || '—'}</div>
+      <div class="info-value">${p.fechaNacimiento ? formatFecha(p.fechaNacimiento) : '—'}</div>
       <div class="info-edit" onclick="editarDatosPaciente()">✏️ editar</div>
     </div>
     <div class="info-card">
       <div class="info-label">Edad</div>
       <div class="info-value">${p.fechaNacimiento ? edad : '—'}</div>
+    </div>
+  `;
+  // Antecedentes
+  document.getElementById('antecedentesBox').innerHTML = `
+    <div class="info-card" style="grid-column:1/-1;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+        <div class="info-label">Antecedentes</div>
+        <div class="info-edit" onclick="editarDatosPaciente()">✏️ editar</div>
+      </div>
+      <div style="font-size:13px;line-height:1.6;color:var(--text);white-space:pre-wrap;">${p.antecedentes || '<span style="color:var(--text3);">Sin antecedentes cargados.</span>'}</div>
     </div>
   `;
 
@@ -930,7 +956,7 @@ function renderConsultas(consultas) {
   box.innerHTML = consultas.map(c => `
     <div class="consulta-card">
       <div class="consulta-top">
-        <div class="consulta-fecha">${c.fecha}</div>
+        <div class="consulta-fecha">${formatFecha(c.fecha)}</div>
         <span class="consulta-motivo">${c.motivo}</span>
       </div>
       <div class="consulta-grid">
@@ -1077,6 +1103,10 @@ function editarDatosPaciente() {
             <input class="form-input" id="ed_af" value="${p.nroAfiliado || ''}" placeholder="Número de afiliado">
           </div>
         </div>
+        <div class="form-group">
+          <label class="form-label">Antecedentes</label>
+          <textarea class="form-input" id="ed_ant" rows="4" placeholder="HTA, DBT, cirugías previas, alergias, antecedentes familiares...">${p.antecedentes || ''}</textarea>
+        </div>
         <div class="modal-actions">
           <button class="btn-cancel" onclick="closeModal()">Cancelar</button>
           <button class="btn-primary" onclick="guardarDatosPaciente()">Guardar</button>
@@ -1090,12 +1120,14 @@ function guardarDatosPaciente() {
   const af = document.getElementById('ed_af').value;
   const os = document.getElementById('ed_os').value;
   const tel = document.getElementById('ed_tel').value;
+  const ant = document.getElementById('ed_ant').value;
   selectedPatient.fechaNacimiento = fn;
   selectedPatient.nroAfiliado = af;
   selectedPatient.obraSocial = os;
   selectedPatient.telefono = tel;
+  selectedPatient.antecedentes = ant;
   closeModal();
-  callScript({action:'actualizarPaciente', documento: selectedPatient.documento, fechaNacimiento: fn, nroAfiliado: af, obraSocial: os, telefono: tel});
+  callScript({action:'actualizarPaciente', documento: selectedPatient.documento, fechaNacimiento: fn, nroAfiliado: af, obraSocial: os, telefono: tel, antecedentes: ant});
   selectPatient(selectedPatient);
 }
 
