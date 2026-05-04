@@ -3,573 +3,200 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Consultorio</title>
+<title>Consultorio Dra. Díaz</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Serif+Display&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #F5F3EF;
-    --surface: #FFFFFF;
-    --surface2: #EFEDE8;
-    --border: #E0DDD7;
-    --text: #1A1814;
-    --text2: #6B6760;
-    --text3: #9E9B96;
-    --accent: #2C5F8A;
-    --accent-light: #E8F1F8;
-    --accent-dark: #1A3D5C;
-    --green: #2D6A4F;
-    --green-light: #E8F5EE;
-    --amber: #92400E;
-    --amber-light: #FEF3C7;
-    --blue-now: #1E40AF;
-    --blue-now-light: #DBEAFE;
-    --radius: 12px;
-    --radius-sm: 8px;
+    --bg: #F5F3EF; --surface: #FFFFFF; --surface2: #EFEDE8;
+    --border: #E0DDD7; --text: #1A1814; --text2: #6B6760; --text3: #9E9B96;
+    --accent: #2C5F8A; --accent-light: #E8F1F8; --accent-dark: #1A3D5C;
+    --green: #2D6A4F; --green-light: #E8F5EE;
+    --amber: #92400E; --amber-light: #FEF3C7;
+    --red: #991B1B; --red-light: #FEE2E2;
+    --radius: 12px; --radius-sm: 8px;
     --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 12px rgba(0,0,0,0.04);
   }
-
   * { box-sizing: border-box; margin: 0; padding: 0; }
-
-  body {
-    font-family: 'DM Sans', sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    height: 100vh;
-    overflow: hidden;
-  }
-
-  /* LAYOUT */
+  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); height: 100vh; overflow: hidden; }
   .app { display: flex; flex-direction: column; height: 100vh; }
 
-  .topbar {
-    background: var(--surface);
-    border-bottom: 1px solid var(--border);
-    padding: 0 24px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    height: 56px;
-    flex-shrink: 0;
-  }
+  /* TOPBAR */
+  .topbar { background: var(--surface); border-bottom: 1px solid var(--border); padding: 0 16px; display: flex; align-items: center; justify-content: space-between; height: 56px; flex-shrink: 0; gap: 10px; }
+  .logo { font-family: 'DM Serif Display', serif; font-size: 14px; color: var(--accent-dark); flex-shrink: 0; }
+  .logo span { color: var(--text3); font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 400; margin-left: 6px; }
+  .nav { display: flex; background: var(--surface2); border-radius: 8px; padding: 3px; gap: 2px; flex-shrink: 0; }
+  .nav-btn { padding: 5px 14px; font-size: 13px; font-family: 'DM Sans', sans-serif; font-weight: 500; border: none; background: transparent; color: var(--text2); border-radius: 6px; cursor: pointer; transition: all 0.15s; }
+  .nav-btn.active { background: var(--surface); color: var(--accent); box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+  .date-chip { font-size: 11px; color: var(--text2); background: var(--surface2); padding: 4px 10px; border-radius: 20px; flex-shrink: 0; }
 
-  .logo {
-    font-family: 'DM Serif Display', serif;
-    font-size: 18px;
-    color: var(--accent-dark);
-    letter-spacing: -0.3px;
-  }
-
-  .logo span { color: var(--text3); font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 400; margin-left: 10px; }
-
-  .nav {
-    display: flex;
-    background: var(--surface2);
-    border-radius: 8px;
-    padding: 3px;
-    gap: 2px;
-  }
-
-  .nav-btn {
-    padding: 6px 16px;
-    font-size: 13px;
-    font-family: 'DM Sans', sans-serif;
-    font-weight: 500;
-    border: none;
-    background: transparent;
-    color: var(--text2);
-    border-radius: 6px;
-    cursor: pointer;
-    transition: all 0.15s;
-  }
-
-  .nav-btn.active {
-    background: var(--surface);
-    color: var(--accent);
-    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
-  }
-
-  .date-chip {
-    font-size: 12px;
-    color: var(--text2);
-    background: var(--surface2);
-    padding: 5px 12px;
-    border-radius: 20px;
-  }
-
+  /* BODY / SCREENS */
   .body { flex: 1; overflow: hidden; display: flex; }
-
-  /* SCREENS */
   .screen { display: none; flex: 1; overflow: hidden; }
   .screen.active { display: flex; }
 
-  /* ========================
-     AGENDA
-  ======================== */
+  /* AGENDA */
   .agenda-screen { flex-direction: column; }
-
-  .agenda-header {
-    padding: 20px 24px 16px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-shrink: 0;
-  }
-
-  .agenda-title { font-size: 20px; font-weight: 600; }
+  .agenda-header { padding: 16px 20px 12px; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; flex-wrap: wrap; gap: 10px; }
+  .agenda-title { font-size: 18px; font-weight: 600; }
   .agenda-sub { font-size: 13px; color: var(--text2); margin-top: 2px; }
-
-  .stats { display: flex; gap: 10px; }
-  .stat {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-    padding: 8px 14px;
-    text-align: center;
-  }
-  .stat-n { font-size: 18px; font-weight: 600; color: var(--accent); }
+  .stats { display: flex; gap: 8px; }
+  .stat { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 6px 12px; text-align: center; }
+  .stat-n { font-size: 16px; font-weight: 600; color: var(--accent); }
   .stat-l { font-size: 11px; color: var(--text3); }
-
-  .agenda-list {
-    flex: 1;
-    overflow-y: auto;
-    padding: 0 24px 24px;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-  }
-
-  .turno-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 14px 18px;
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    transition: box-shadow 0.15s;
-    box-shadow: var(--shadow);
-  }
-
-  .turno-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.08); }
-  .turno-card.actual { border-color: var(--accent); border-left: 3px solid var(--accent); }
-  .turno-card.atendido { opacity: 0.55; }
-
-  .turno-hora {
-    font-size: 18px;
-    font-weight: 600;
-    color: var(--accent);
-    min-width: 52px;
-    font-variant-numeric: tabular-nums;
-  }
-
-  .turno-card.atendido .turno-hora { color: var(--text3); }
-
-  .turno-sep { width: 1px; height: 36px; background: var(--border); flex-shrink: 0; }
-
+  .agenda-list { flex: 1; overflow-y: auto; padding: 0 20px 20px; display: flex; flex-direction: column; gap: 8px; }
+  .turno-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px 16px; display: flex; align-items: center; gap: 14px; box-shadow: var(--shadow); }
+  .turno-card.atendido { opacity: 0.6; }
+  .turno-hora { font-size: 17px; font-weight: 600; color: var(--accent); min-width: 48px; }
+  .turno-sep { width: 1px; height: 32px; background: var(--border); flex-shrink: 0; }
   .turno-info { flex: 1; min-width: 0; }
-  .turno-nombre { font-size: 15px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .turno-meta { font-size: 12px; color: var(--text2); margin-top: 3px; display: flex; gap: 12px; }
-
-  .badge {
-    display: inline-flex;
-    align-items: center;
-    font-size: 11px;
-    font-weight: 500;
-    padding: 3px 10px;
-    border-radius: 20px;
-    flex-shrink: 0;
-  }
-
+  .turno-nombre { font-size: 14px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .turno-meta { font-size: 12px; color: var(--text2); margin-top: 2px; display: flex; gap: 10px; flex-wrap: wrap; }
+  .turno-actions { display: flex; gap: 6px; align-items: center; flex-shrink: 0; flex-wrap: wrap; }
+  .badge { display: inline-flex; align-items: center; font-size: 11px; font-weight: 500; padding: 3px 8px; border-radius: 20px; cursor: pointer; }
   .badge-pendiente { background: var(--amber-light); color: var(--amber); }
-  .badge-actual { background: var(--blue-now-light); color: var(--blue-now); }
   .badge-atendido { background: var(--green-light); color: var(--green); }
   .badge-cancelado { background: var(--surface2); color: var(--text3); }
+  .btn-ficha { padding: 6px 12px; font-size: 12px; font-family: 'DM Sans', sans-serif; font-weight: 500; background: var(--accent-light); color: var(--accent); border: none; border-radius: var(--radius-sm); cursor: pointer; white-space: nowrap; }
+  .loading-msg { text-align: center; padding: 40px; color: var(--text2); font-size: 14px; }
 
-  .btn-ficha {
-    padding: 7px 14px;
-    font-size: 13px;
-    font-family: 'DM Sans', sans-serif;
-    font-weight: 500;
-    background: var(--accent-light);
-    color: var(--accent);
-    border: none;
-    border-radius: var(--radius-sm);
-    cursor: pointer;
-    white-space: nowrap;
-    transition: background 0.15s;
-    flex-shrink: 0;
-  }
-
-  .btn-ficha:hover { background: #d4e6f5; }
-
-  .loading-msg {
-    text-align: center;
-    padding: 40px;
-    color: var(--text2);
-    font-size: 14px;
-  }
-
-  /* ========================
-     PACIENTES
-  ======================== */
+  /* PACIENTES */
   .pacientes-screen { flex-direction: row; }
-
-  .sidebar {
-    width: 260px;
-    min-width: 260px;
-    background: var(--surface);
-    border-right: 1px solid var(--border);
-    display: flex;
-    flex-direction: column;
-  }
-
-  .sidebar-top {
-    padding: 16px;
-    border-bottom: 1px solid var(--border);
-  }
-
-  .sidebar-label {
-    font-size: 11px;
-    font-weight: 600;
-    color: var(--text3);
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    margin-bottom: 10px;
-  }
-
+  .sidebar { width: 250px; min-width: 250px; background: var(--surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; }
+  .sidebar-top { padding: 14px; border-bottom: 1px solid var(--border); }
+  .sidebar-label { font-size: 11px; font-weight: 600; color: var(--text3); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; }
   .search-wrap { position: relative; }
-  .search-icon { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--text3); font-size: 14px; }
-
-  .search-box {
-    width: 100%;
-    padding: 8px 10px 8px 32px;
-    font-size: 13px;
-    font-family: 'DM Sans', sans-serif;
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-    background: var(--bg);
-    color: var(--text);
-    outline: none;
-    transition: border-color 0.15s;
-  }
-
+  .search-icon { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--text3); font-size: 13px; }
+  .search-box { width: 100%; padding: 7px 10px 7px 30px; font-size: 13px; font-family: 'DM Sans', sans-serif; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--bg); color: var(--text); outline: none; }
   .search-box:focus { border-color: var(--accent); }
-
   .patient-list { overflow-y: auto; flex: 1; }
-
-  .patient-item {
-    padding: 12px 16px;
-    cursor: pointer;
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    transition: background 0.1s;
-  }
-
+  .patient-item { padding: 11px 14px; cursor: pointer; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; transition: background 0.1s; }
   .patient-item:hover { background: var(--bg); }
   .patient-item.active { background: var(--accent-light); }
-
-  .avatar {
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-    background: var(--accent-light);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 12px;
-    font-weight: 600;
-    color: var(--accent);
-    flex-shrink: 0;
-  }
-
+  .avatar { width: 34px; height: 34px; border-radius: 50%; background: var(--accent-light); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; color: var(--accent); flex-shrink: 0; }
   .patient-item.active .avatar { background: var(--accent); color: #fff; }
-
   .patient-name { font-size: 13px; font-weight: 500; }
   .patient-doc { font-size: 11px; color: var(--text3); margin-top: 1px; }
 
   /* FICHA */
   .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
-
-  .main-header {
-    padding: 16px 24px;
-    border-bottom: 1px solid var(--border);
-    background: var(--surface);
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 16px;
-    flex-shrink: 0;
-  }
-
-  .main-title { font-size: 18px; font-weight: 600; }
-  .main-sub { font-size: 12px; color: var(--text2); margin-top: 3px; }
-
-  .header-btns { display: flex; gap: 8px; flex-shrink: 0; }
-
-  .btn-ia {
-    padding: 7px 14px;
-    font-size: 13px;
-    font-family: 'DM Sans', sans-serif;
-    font-weight: 500;
-    background: transparent;
-    border: 1.5px solid var(--accent);
-    color: var(--accent);
-    border-radius: var(--radius-sm);
-    cursor: pointer;
-    transition: all 0.15s;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-  }
-
-  .btn-ia:hover { background: var(--accent-light); }
+  .main-header { padding: 14px 20px; border-bottom: 1px solid var(--border); background: var(--surface); display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; flex-shrink: 0; }
+  .main-title { font-size: 17px; font-weight: 600; }
+  .main-sub { font-size: 12px; color: var(--text2); margin-top: 2px; }
+  .header-btns { display: flex; gap: 8px; flex-shrink: 0; flex-wrap: wrap; }
+  .btn-ia { padding: 6px 12px; font-size: 12px; font-family: 'DM Sans', sans-serif; font-weight: 500; background: transparent; border: 1.5px solid var(--accent); color: var(--accent); border-radius: var(--radius-sm); cursor: pointer; display: flex; align-items: center; gap: 5px; }
   .btn-ia:disabled { opacity: 0.4; cursor: not-allowed; }
-
-  .btn-primary {
-    padding: 7px 16px;
-    font-size: 13px;
-    font-family: 'DM Sans', sans-serif;
-    font-weight: 500;
-    background: var(--accent);
-    color: #fff;
-    border: none;
-    border-radius: var(--radius-sm);
-    cursor: pointer;
-    transition: background 0.15s;
-  }
-
+  .btn-primary { padding: 6px 14px; font-size: 12px; font-family: 'DM Sans', sans-serif; font-weight: 500; background: var(--accent); color: #fff; border: none; border-radius: var(--radius-sm); cursor: pointer; }
   .btn-primary:hover { background: var(--accent-dark); }
-
-  .content {
-    flex: 1;
-    overflow-y: auto;
-    padding: 20px 24px;
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
-  }
-
-  .info-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
-
-  .info-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-    padding: 12px 14px;
-  }
-
-  .info-label { font-size: 11px; color: var(--text3); margin-bottom: 4px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em; }
+  .content { flex: 1; overflow-y: auto; padding: 16px 20px; display: flex; flex-direction: column; gap: 12px; }
+  .info-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+  .info-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 10px 12px; }
+  .info-label { font-size: 10px; color: var(--text3); margin-bottom: 3px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em; }
   .info-value { font-size: 13px; font-weight: 500; }
-  .info-edit { font-size: 11px; color: var(--accent); cursor: pointer; margin-top: 4px; }
-
-  .section-label {
-    font-size: 11px;
-    font-weight: 600;
-    color: var(--text3);
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-  }
-
-  /* RESUMEN IA */
-  .resumen-card {
-    background: linear-gradient(135deg, #EBF4FB 0%, #F0F7FF 100%);
-    border: 1px solid #C5DDF0;
-    border-radius: var(--radius);
-    padding: 16px 18px;
-  }
-
-  .resumen-header {
-    font-size: 11px;
-    font-weight: 600;
-    color: var(--accent);
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    margin-bottom: 8px;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-  }
-
+  .info-edit { font-size: 11px; color: var(--accent); cursor: pointer; margin-top: 3px; }
+  .section-label { font-size: 11px; font-weight: 600; color: var(--text3); text-transform: uppercase; letter-spacing: 0.08em; }
+  .resumen-card { background: linear-gradient(135deg, #EBF4FB, #F0F7FF); border: 1px solid #C5DDF0; border-radius: var(--radius); padding: 14px 16px; }
+  .resumen-header { font-size: 11px; font-weight: 600; color: var(--accent); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; }
   .resumen-text { font-size: 13px; color: var(--accent-dark); line-height: 1.7; }
-
-  .spinner-wrap { display: flex; align-items: center; gap: 10px; color: var(--accent); font-size: 13px; }
-  .spinner {
-    width: 14px; height: 14px;
-    border: 2px solid #C5DDF0;
-    border-top-color: var(--accent);
-    border-radius: 50%;
-    animation: spin 0.8s linear infinite;
-    flex-shrink: 0;
-  }
+  .spinner-wrap { display: flex; align-items: center; gap: 8px; color: var(--accent); font-size: 13px; }
+  .spinner { width: 13px; height: 13px; border: 2px solid #C5DDF0; border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; flex-shrink: 0; }
   @keyframes spin { to { transform: rotate(360deg); } }
-
-  /* CONSULTA CARD */
-  .consulta-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 16px 18px;
-    box-shadow: var(--shadow);
-  }
-
-  .consulta-top {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 12px;
-    padding-bottom: 10px;
-    border-bottom: 1px solid var(--border);
-  }
-
+  .consulta-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; box-shadow: var(--shadow); }
+  .consulta-top { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px solid var(--border); flex-wrap: wrap; }
   .consulta-fecha { font-size: 13px; font-weight: 600; }
-  .consulta-motivo {
-    font-size: 11px;
-    font-weight: 500;
-    padding: 3px 10px;
-    border-radius: 20px;
-    background: var(--accent-light);
-    color: var(--accent);
-  }
-
-  .consulta-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 10px; }
-  .c-label { font-size: 11px; color: var(--text3); margin-bottom: 3px; font-weight: 500; }
+  .consulta-motivo { font-size: 11px; font-weight: 500; padding: 2px 8px; border-radius: 20px; background: var(--accent-light); color: var(--accent); }
+  .consulta-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 8px; }
+  .c-label { font-size: 11px; color: var(--text3); margin-bottom: 2px; font-weight: 500; }
   .c-value { font-size: 13px; }
-
-  .evol-box {
-    background: var(--bg);
-    border-radius: var(--radius-sm);
-    padding: 10px 12px;
-    font-size: 13px;
-    line-height: 1.6;
-    color: var(--text);
-  }
-
-  .empty-ficha {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
-    gap: 10px;
-    color: var(--text3);
-  }
-
-  .empty-icon { font-size: 32px; opacity: 0.3; }
+  .evol-box { background: var(--bg); border-radius: var(--radius-sm); padding: 8px 10px; font-size: 13px; line-height: 1.6; }
+  .empty-ficha { flex: 1; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 8px; color: var(--text3); }
 
   /* MODAL */
-  .modal-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(10,8,5,0.4);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 100;
-    backdrop-filter: blur(2px);
-  }
-
-  .modal {
-    background: var(--surface);
-    border-radius: var(--radius);
-    border: 1px solid var(--border);
-    padding: 24px;
-    width: 480px;
-    max-width: 95vw;
-    max-height: 90vh;
-    overflow-y: auto;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.15);
-  }
-
-  .modal-title { font-size: 16px; font-weight: 600; margin-bottom: 18px; }
-
-  .form-group { margin-bottom: 14px; }
-  .form-label { font-size: 12px; font-weight: 500; color: var(--text2); margin-bottom: 5px; display: block; }
-
-  .form-input {
-    width: 100%;
-    padding: 9px 12px;
-    font-size: 13px;
-    font-family: 'DM Sans', sans-serif;
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-    background: var(--bg);
-    color: var(--text);
-    outline: none;
-    transition: border-color 0.15s;
-  }
-
+  .modal-overlay { position: fixed; inset: 0; background: rgba(10,8,5,0.4); display: flex; align-items: center; justify-content: center; z-index: 100; backdrop-filter: blur(2px); }
+  .modal { background: var(--surface); border-radius: var(--radius); border: 1px solid var(--border); padding: 20px; width: 560px; max-width: 95vw; max-height: 92vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.15); }
+  .modal-title { font-size: 15px; font-weight: 600; margin-bottom: 14px; }
+  .form-group { margin-bottom: 12px; }
+  .form-label { font-size: 12px; font-weight: 500; color: var(--text2); margin-bottom: 4px; display: block; }
+  .form-input { width: 100%; padding: 8px 10px; font-size: 13px; font-family: 'DM Sans', sans-serif; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--bg); color: var(--text); outline: none; transition: border-color 0.15s; }
   .form-input:focus { border-color: var(--accent); background: var(--surface); }
-  textarea.form-input { resize: vertical; min-height: 80px; line-height: 1.5; }
+  textarea.form-input { resize: vertical; min-height: 75px; line-height: 1.5; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--border); }
+  .btn-cancel { padding: 7px 14px; font-size: 13px; font-family: 'DM Sans', sans-serif; background: transparent; border: 1px solid var(--border); border-radius: var(--radius-sm); cursor: pointer; color: var(--text2); }
 
-  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-
-  .modal-actions {
-    display: flex;
-    gap: 10px;
-    justify-content: flex-end;
-    margin-top: 20px;
-    padding-top: 16px;
-    border-top: 1px solid var(--border);
-  }
-
-  .btn-cancel {
-    padding: 8px 16px;
-    font-size: 13px;
-    font-family: 'DM Sans', sans-serif;
-    background: transparent;
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-    cursor: pointer;
-    color: var(--text2);
-  }
+  /* TABS MODAL */
+  .modal-tabs { display: flex; gap: 2px; background: var(--surface2); border-radius: 8px; padding: 3px; margin-bottom: 16px; }
+  .modal-tab { flex: 1; padding: 7px; font-size: 12px; font-family: 'DM Sans', sans-serif; font-weight: 500; border: none; background: transparent; color: var(--text2); border-radius: 6px; cursor: pointer; text-align: center; }
+  .modal-tab.active { background: var(--surface); color: var(--accent); box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
 
   /* CIE10 */
   .cie-wrap { position: relative; }
-  .cie-results {
-    position: absolute;
-    top: 100%;
-    left: 0; right: 0;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-    max-height: 180px;
-    overflow-y: auto;
-    z-index: 200;
-    box-shadow: var(--shadow);
-  }
-
-  .cie-item {
-    padding: 8px 12px;
-    font-size: 13px;
-    cursor: pointer;
-    border-bottom: 1px solid var(--border);
-    transition: background 0.1s;
-  }
-
+  .cie-results { position: absolute; top: 100%; left: 0; right: 0; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); max-height: 160px; overflow-y: auto; z-index: 200; box-shadow: var(--shadow); }
+  .cie-item { padding: 7px 10px; font-size: 13px; cursor: pointer; border-bottom: 1px solid var(--border); }
   .cie-item:hover { background: var(--accent-light); }
-  .cie-code { font-size: 11px; font-weight: 600; color: var(--accent); margin-right: 6px; }
+  .cie-code { font-size: 11px; font-weight: 600; color: var(--accent); margin-right: 5px; }
+  .mic-btn { position: absolute; right: 8px; top: 8px; background: transparent; border: none; cursor: pointer; font-size: 16px; opacity: 0.5; }
+  .mic-btn:hover { opacity: 1; }
+  .mic-btn.recording { opacity: 1; animation: pulse 1s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+  /* LAB FIELDS */
+  .lab-section { margin-bottom: 14px; }
+  .lab-section-title { font-size: 11px; font-weight: 600; color: var(--accent); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; padding-bottom: 4px; border-bottom: 1px solid var(--border); }
+  .lab-field { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+  .lab-field label { font-size: 12px; color: var(--text2); flex: 1; min-width: 120px; }
+  .lab-field input { width: 80px; padding: 5px 8px; font-size: 12px; font-family: 'DM Sans', sans-serif; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--bg); color: var(--text); outline: none; text-align: right; }
+  .lab-field input:focus { border-color: var(--accent); }
+  .lab-field .lab-unit { font-size: 11px; color: var(--text3); min-width: 55px; }
+  .lab-field .lab-ref { font-size: 10px; color: var(--text3); min-width: 60px; text-align: right; }
+
+  /* SCORES */
+  .score-section { background: var(--bg); border-radius: var(--radius-sm); padding: 12px; margin-bottom: 10px; }
+  .score-title { font-size: 12px; font-weight: 600; color: var(--accent); margin-bottom: 10px; }
+  .score-field { margin-bottom: 8px; }
+  .score-field label { font-size: 12px; color: var(--text2); display: block; margin-bottom: 3px; }
+  .score-field input, .score-field select { width: 100%; padding: 6px 8px; font-size: 12px; font-family: 'DM Sans', sans-serif; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--surface); color: var(--text); outline: none; }
+  .score-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .score-result { margin-top: 8px; padding: 8px 10px; border-radius: var(--radius-sm); font-size: 12px; font-weight: 500; }
+  .score-ok { background: var(--green-light); color: var(--green); }
+  .score-warn { background: var(--amber-light); color: var(--amber); }
+  .score-bad { background: var(--red-light); color: var(--red); }
+  .btn-score { padding: 6px 12px; font-size: 12px; font-family: 'DM Sans', sans-serif; font-weight: 500; background: var(--accent); color: #fff; border: none; border-radius: var(--radius-sm); cursor: pointer; margin-top: 6px; }
+  .btn-agregar { padding: 5px 10px; font-size: 11px; font-family: 'DM Sans', sans-serif; background: var(--accent-light); color: var(--accent); border: none; border-radius: var(--radius-sm); cursor: pointer; margin-top: 4px; }
 
   /* SCROLLBAR */
   ::-webkit-scrollbar { width: 4px; }
   ::-webkit-scrollbar-track { background: transparent; }
   ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
 
-  /* RESPONSIVE */
-  @media (max-width: 600px) {
-    .sidebar { width: 200px; min-width: 200px; }
+  /* MOBILE */
+  @media (max-width: 640px) {
+    .logo { font-size: 11px; }
+    .logo span { display: none; }
+    .nav-btn { padding: 5px 8px; font-size: 11px; }
+    .date-chip { display: none; }
+    .stats { display: none; }
+    .pacientes-screen { flex-direction: column; }
+    .sidebar { width: 100%; min-width: unset; border-right: none; }
+    .sidebar.mobile-hidden { display: none; }
+    .main { display: none; }
+    .main.mobile-visible { display: flex; }
     .info-grid { grid-template-columns: 1fr 1fr; }
     .consulta-grid { grid-template-columns: 1fr; }
-    .stats { display: none; }
+    .form-row { grid-template-columns: 1fr; }
+    .score-row { grid-template-columns: 1fr; }
+    .turno-actions { flex-direction: column; align-items: flex-end; }
+  }
+  @media (min-width: 641px) {
+    .btn-back-mobile { display: none !important; }
   }
 </style>
 </head>
 <body>
-
 <div class="app">
   <div class="topbar">
-    <div class="logo">Consultorio Dra. Olga Yolanda Díaz - Endocrinología -MP 81622 <span id="topDate"></span></div>
+    <div class="logo">Consultorio Dra. Olga Yolanda Díaz - Endocrinología - MP 81622 <span id="topDate"></span></div>
     <div class="nav">
       <button class="nav-btn active" id="navAgenda" onclick="showScreen('agenda')">Agenda</button>
       <button class="nav-btn" id="navPacientes" onclick="showScreen('pacientes')">Pacientes</button>
@@ -584,15 +211,15 @@
         <div class="agenda-header">
           <div>
             <div class="agenda-title">Agenda</div>
-            <div class="agenda-sub" id="agendaSub">Cargando turnos...</div>
+            <div class="agenda-sub" id="agendaSub">Cargando...</div>
           </div>
-          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
             <div style="display:flex;align-items:center;gap:4px;background:var(--surface2);border-radius:8px;padding:3px 6px;">
               <button onclick="cambiarFecha(-1)" style="border:none;background:transparent;cursor:pointer;padding:4px 8px;font-size:18px;color:var(--accent);line-height:1;">‹</button>
               <input type="date" id="fechaAgenda" style="border:none;background:transparent;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;color:var(--text);outline:none;cursor:pointer;padding:4px;" onchange="loadAgenda()">
               <button onclick="cambiarFecha(1)" style="border:none;background:transparent;cursor:pointer;padding:4px 8px;font-size:18px;color:var(--accent);line-height:1;">›</button>
             </div>
-            <button onclick="irAHoy()" style="padding:6px 12px;font-size:12px;font-family:'DM Sans',sans-serif;font-weight:500;background:var(--accent-light);color:var(--accent);border:none;border-radius:6px;cursor:pointer;">Hoy</button>
+            <button onclick="irAHoy()" style="padding:5px 10px;font-size:12px;font-family:'DM Sans',sans-serif;font-weight:500;background:var(--accent-light);color:var(--accent);border:none;border-radius:6px;cursor:pointer;">Hoy</button>
             <div class="stats">
               <div class="stat"><div class="stat-n" id="statTotal">—</div><div class="stat-l">Total</div></div>
               <div class="stat"><div class="stat-n" id="statPend">—</div><div class="stat-l">Pendientes</div></div>
@@ -600,15 +227,13 @@
             </div>
           </div>
         </div>
-        <div class="agenda-list" id="agendaList">
-          <div class="loading-msg">⏳ Cargando turnos desde tu agenda...</div>
-        </div>
+        <div class="agenda-list" id="agendaList"><div class="loading-msg">⏳ Cargando...</div></div>
       </div>
     </div>
 
     <!-- PACIENTES -->
     <div class="screen pacientes-screen" id="screenPacientes">
-      <div class="sidebar">
+      <div class="sidebar" id="pacientesSidebar">
         <div class="sidebar-top">
           <div class="sidebar-label">Pacientes</div>
           <div class="search-wrap">
@@ -616,20 +241,19 @@
             <input class="search-box" type="text" placeholder="Nombre o documento..." id="searchInput" oninput="filterPatients()">
           </div>
         </div>
-        <div class="patient-list" id="patientList">
-          <div class="loading-msg" style="padding:20px;font-size:13px;color:var(--text3);">Cargando...</div>
-        </div>
+        <div class="patient-list" id="patientList"><div class="loading-msg" style="padding:20px;font-size:13px;color:var(--text3);">Cargando...</div></div>
       </div>
 
-      <div class="main">
+      <div class="main" id="pacientesMain">
         <div class="empty-ficha" id="emptyFicha">
-          <div class="empty-icon">🩺</div>
+          <div style="font-size:28px;opacity:0.3;">🩺</div>
           <div style="font-size:14px;">Seleccioná un paciente</div>
           <div style="font-size:12px;">para ver su historia clínica</div>
         </div>
         <div id="fichaView" style="display:none;flex-direction:column;height:100%;">
           <div class="main-header">
             <div>
+              <button class="btn-back-mobile" onclick="volverALista()" style="background:transparent;border:none;cursor:pointer;color:var(--accent);font-size:13px;font-family:'DM Sans',sans-serif;margin-bottom:4px;padding:0;">← Volver</button>
               <div class="main-title" id="fichaName"></div>
               <div class="main-sub" id="fichaSub"></div>
             </div>
@@ -640,7 +264,7 @@
           </div>
           <div class="content">
             <div class="info-grid" id="fichaGrid"></div>
-          <div id="antecedentesBox"></div>
+            <div id="antecedentesBox"></div>
             <div id="resumenBox"></div>
             <div class="section-label">Historial de consultas</div>
             <div id="consultasBox"></div>
@@ -655,14 +279,14 @@
 
 <script>
 const SCRIPT_URL = 'https://consultoriodradiaz.netlify.app/.netlify/functions/api';
+const DRA = { nombre: 'Dra. Olga Yolanda Díaz', especialidad: 'Endocrinología', matricula: 'MP 81622' };
 
-let allPatients = [];
-let filteredPatients = [];
-let selectedPatient = null;
+let allPatients = [], filteredPatients = [], selectedPatient = null;
+let turnosCache = [];
+const isMobile = () => window.innerWidth <= 640;
 
-// ─── CIE-10 básico (ampliable) ───────────────────────────────
+// ── CIE-10 ───────────────────────────────────────────────────
 const CIE10 = [
-  // DIABETES
   {code:'E10',desc:'Diabetes mellitus tipo 1'},
   {code:'E11',desc:'Diabetes mellitus tipo 2'},
   {code:'E11.9',desc:'Diabetes mellitus tipo 2 sin complicaciones'},
@@ -671,10 +295,7 @@ const CIE10 = [
   {code:'E13',desc:'Otras diabetes mellitus especificadas'},
   {code:'E14',desc:'Diabetes mellitus no especificada'},
   {code:'O24',desc:'Diabetes mellitus gestacional'},
-  // TIROIDES
-  {code:'E00',desc:'Síndrome de deficiencia de yodo'},
-  {code:'E01',desc:'Trastornos tiroideos por deficiencia de yodo'},
-  {code:'E02',desc:'Hipotiroidismo subclínico por deficiencia de yodo'},
+  {code:'E02',desc:'Hipotiroidismo subclínico'},
   {code:'E03',desc:'Hipotiroidismo'},
   {code:'E03.9',desc:'Hipotiroidismo no especificado'},
   {code:'E04',desc:'Bocio no tóxico'},
@@ -686,273 +307,225 @@ const CIE10 = [
   {code:'C73',desc:'Carcinoma papilar de tiroides'},
   {code:'D34',desc:'Tumor benigno de tiroides'},
   {code:'D44.0',desc:'Tumor de comportamiento incierto de tiroides'},
-  // SUPRARRENALES
-  {code:'D44.1',desc:'Incidentaloma suprarrenal / Tumor de comportamiento incierto de suprarrenal'},
+  {code:'D44.1',desc:'Incidentaloma suprarrenal'},
   {code:'E24',desc:'Síndrome de Cushing'},
   {code:'E25',desc:'Trastornos adrenogenitales'},
   {code:'E26',desc:'Hiperaldosteronismo'},
   {code:'E27',desc:'Otros trastornos suprarrenales'},
-  // HIPÓFISIS
-  {code:'E22',desc:'Hiperfunción hipofisaria'},
   {code:'E22.0',desc:'Acromegalia'},
   {code:'E22.1',desc:'Hiperprolactinemia'},
-  {code:'E23',desc:'Hipofunción hipofisaria'},
   {code:'E23.0',desc:'Hipopituitarismo'},
-  // GÓNADAS
   {code:'E28',desc:'Disfunción ovárica'},
   {code:'E29',desc:'Disfunción testicular'},
   {code:'E34.9',desc:'Trastorno endocrino no especificado'},
-  // METABOLISMO
   {code:'E66',desc:'Obesidad'},
   {code:'E66.0',desc:'Obesidad por exceso de calorías'},
-  {code:'E78',desc:'Trastornos del metabolismo de lipoproteínas'},
   {code:'E78.0',desc:'Hipercolesterolemia pura'},
   {code:'E78.1',desc:'Hipertrigliceridemia pura'},
   {code:'E78.5',desc:'Hiperlipidemia mixta'},
-  {code:'E79',desc:'Trastornos del metabolismo de purinas y pirimidinas'},
-  {code:'E83',desc:'Trastornos del metabolismo de minerales'},
   {code:'E83.5',desc:'Trastornos del metabolismo del calcio'},
-  // CONTROLES
   {code:'Z00',desc:'Control general'},
   {code:'Z13',desc:'Pesquisa de enfermedades endócrinas'},
-  {code:'Z83',desc:'Antecedentes familiares de enfermedades endócrinas'},
 ];
 
-// ─── Utils ───────────────────────────────────────────────────
+// ── Utils ─────────────────────────────────────────────────────
 function initials(n) { return n.split(' ').filter(Boolean).map(w=>w[0]).join('').slice(0,2).toUpperCase(); }
-
 function formatFecha(f) {
   if (!f) return '—';
-  // Si ya está en formato DD/MM/AAAA lo devuelve tal cual
   if (/^\d{2}\/\d{2}\/\d{4}$/.test(String(f))) return f;
-  // Si es ISO o cualquier otro formato parseable
   try {
     const d = new Date(f);
     if (isNaN(d.getTime())) return String(f);
-    const dd = String(d.getUTCDate()).padStart(2,'0');
-    const mm = String(d.getUTCMonth()+1).padStart(2,'0');
-    const yy = d.getUTCFullYear();
-    return `${dd}/${mm}/${yy}`;
+    return `${String(d.getUTCDate()).padStart(2,'0')}/${String(d.getUTCMonth()+1).padStart(2,'0')}/${d.getUTCFullYear()}`;
   } catch(e) { return String(f); }
 }
-
 function calcEdad(fn) {
   if (!fn) return '—';
   let d,m,y;
-  if (fn.includes('/')) { [d,m,y] = fn.split('/').map(Number); }
-  else if (fn.includes('-')) { [y,m,d] = fn.split('-').map(Number); }
+  const s = String(fn);
+  if (s.includes('/')) [d,m,y] = s.split('/').map(Number);
+  else if (s.includes('-')) { const p = s.split('T')[0].split('-').map(Number); y=p[0];m=p[1];d=p[2]; }
   else return '—';
   const hoy = new Date();
   let age = hoy.getFullYear() - y;
   if (hoy < new Date(hoy.getFullYear(), m-1, d)) age--;
   return age + ' años';
 }
-
 function setTopbar() {
   const hoy = new Date();
   const dias = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
   const meses = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
   document.getElementById('topDate').textContent = `${dias[hoy.getDay()]} ${hoy.getDate()} de ${meses[hoy.getMonth()]}`;
-  function tick() {
-    const now = new Date();
-    document.getElementById('topHora').textContent = now.toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'});
-  }
+  function tick() { document.getElementById('topHora').textContent = new Date().toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'}); }
   tick(); setInterval(tick, 10000);
 }
+function callScript(params) { return fetch(SCRIPT_URL + '?' + new URLSearchParams(params)).then(r => r.json()); }
+function getTodayStr() { return new Date().toISOString().slice(0,10); }
 
-// ─── Llamadas al Apps Script ──────────────────────────────────
-function callScript(params) {
-  const url = SCRIPT_URL + '?' + new URLSearchParams(params);
-  return fetch(url).then(r => r.json());
-}
-
-// ─── AGENDA ──────────────────────────────────────────────────
-function getTodayStr() {
-  const hoy = new Date();
-  return hoy.toISOString().slice(0,10);
-}
-
-function irAHoy() {
-  document.getElementById('fechaAgenda').value = getTodayStr();
-  loadAgenda();
-}
-
-function cambiarFecha(dias) {
+// ── AGENDA ───────────────────────────────────────────────────
+function irAHoy() { document.getElementById('fechaAgenda').value = getTodayStr(); loadAgenda(); }
+function cambiarFecha(n) {
   const input = document.getElementById('fechaAgenda');
-  const fecha = new Date(input.value + 'T12:00:00');
-  fecha.setDate(fecha.getDate() + dias);
-  input.value = fecha.toISOString().slice(0,10);
+  const f = new Date(input.value + 'T12:00:00');
+  f.setDate(f.getDate() + n);
+  input.value = f.toISOString().slice(0,10);
   loadAgenda();
 }
-
 function loadAgenda() {
-  const input = document.getElementById('fechaAgenda');
-  const fecha = input.value || getTodayStr();
+  const fecha = document.getElementById('fechaAgenda').value || getTodayStr();
   document.getElementById('agendaList').innerHTML = '<div class="loading-msg">⏳ Cargando...</div>';
-  callScript({action:'getTurnosPorFecha', fecha: fecha}).then(data => {
-    const turnos = Array.isArray(data) ? data : [];
-    renderAgenda(turnos, fecha);
+  callScript({action:'getTurnosPorFecha', fecha}).then(data => {
+    turnosCache = Array.isArray(data) ? data : [];
+    renderAgenda(turnosCache, fecha);
   }).catch(() => {
-    document.getElementById('agendaList').innerHTML = '<div class="loading-msg">⚠️ Error al cargar la agenda. Revisá la conexión.</div>';
+    document.getElementById('agendaList').innerHTML = '<div class="loading-msg">⚠️ Error al cargar la agenda.</div>';
   });
 }
-
-function renderAgenda(turnos) {
-  const list = document.getElementById('agendaList');
+function renderAgenda(turnos, fecha) {
   const total = turnos.length;
   const atendidos = turnos.filter(t => t.estado && t.estado.toUpperCase() === 'ATTENDED').length;
-  const pendientes = total - atendidos;
-
-  document.getElementById('agendaSub').textContent = total ? `${total} turnos programados` : 'Sin turnos para este día';
+  const [y,m,d] = (fecha||getTodayStr()).split('-');
+  const dias = ['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
+  const meses = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+  const dt = new Date((fecha||getTodayStr()) + 'T12:00:00');
+  document.getElementById('agendaSub').textContent = total ? `${total} turno${total>1?'s':''} — ${dias[dt.getDay()]} ${d} de ${meses[parseInt(m)-1]} ${y}` : `Sin turnos — ${dias[dt.getDay()]} ${d} de ${meses[parseInt(m)-1]} ${y}`;
   document.getElementById('statTotal').textContent = total;
-  document.getElementById('statPend').textContent = pendientes;
+  document.getElementById('statPend').textContent = total - atendidos;
   document.getElementById('statAt').textContent = atendidos;
-
-  if (!total) {
-    list.innerHTML = '<div class="loading-msg">📅 No hay turnos programados para hoy.</div>';
-    return;
-  }
-
+  const list = document.getElementById('agendaList');
+  if (!total) { list.innerHTML = '<div class="loading-msg">📅 Sin turnos para este día.</div>'; return; }
   list.innerHTML = '';
-  turnos.forEach(t => {
-    const esAtendido = t.estado && t.estado.toUpperCase() === 'ATTENDED';
+  turnos.forEach((t, idx) => {
+    const estado = (t.estado||'').toUpperCase();
+    const esAt = estado === 'ATTENDED';
     const div = document.createElement('div');
-    div.className = 'turno-card' + (esAtendido ? ' atendido' : '');
-    const badgeClass = esAtendido ? 'badge-atendido' : 'badge-pendiente';
-    const badgeLabel = esAtendido ? 'Atendido' : 'Pendiente';
+    div.className = 'turno-card' + (esAt ? ' atendido' : '');
+    div.id = `turno_${idx}`;
+    const badgeLabel = esAt ? 'Atendido' : 'Pendiente';
+    const badgeClass = esAt ? 'badge-atendido' : 'badge-pendiente';
     div.innerHTML = `
       <div class="turno-hora">${t.hora}</div>
       <div class="turno-sep"></div>
       <div class="turno-info">
         <div class="turno-nombre">${t.nombre}</div>
         <div class="turno-meta">
-          <span>${t.obraSocial || '—'}</span>
-          <span>DNI ${t.documento || '—'}</span>
-          ${t.primeraVez ? '<span style="color:var(--accent);font-weight:500;">★ Primera vez</span>' : ''}
+          <span>${t.obraSocial||'—'}</span>
+          <span>DNI ${t.documento||'—'}</span>
+          ${t.primeraVez ? '<span style="color:var(--accent);font-weight:500;">★ 1ª vez</span>' : ''}
         </div>
       </div>
-      <span class="badge ${badgeClass}">${badgeLabel}</span>
-      <button class="btn-ficha" onclick="verFichaDesdeAgenda('${t.documento}','${t.nombre}')">Ver ficha →</button>
-    `;
+      <div class="turno-actions">
+        <span class="badge ${badgeClass}" onclick="cambiarEstadoTurno(${idx})" title="Clic para cambiar estado">${badgeLabel}</span>
+        <button class="btn-ficha" onclick="verFichaDesdeAgenda('${t.documento}','${t.nombre}')">Ver ficha →</button>
+      </div>`;
     list.appendChild(div);
   });
+}
+
+function cambiarEstadoTurno(idx) {
+  const t = turnosCache[idx];
+  if (!t) return;
+  const estado = (t.estado||'').toUpperCase();
+  let nuevoEstado;
+  if (estado === 'ATTENDED') nuevoEstado = '';
+  else nuevoEstado = 'ATTENDED';
+  callScript({action:'actualizarEstadoTurno', idBooking: t.idBooking, estado: nuevoEstado}).then(() => {
+    turnosCache[idx].estado = nuevoEstado;
+    const card = document.getElementById(`turno_${idx}`);
+    if (!card) return;
+    const badge = card.querySelector('.badge');
+    const esAt = nuevoEstado === 'ATTENDED';
+    card.className = 'turno-card' + (esAt ? ' atendido' : '');
+    badge.className = 'badge ' + (esAt ? 'badge-atendido' : 'badge-pendiente');
+    badge.textContent = esAt ? 'Atendido' : 'Pendiente';
+    // Actualizar stats
+    const atendidos = turnosCache.filter(x => (x.estado||'').toUpperCase() === 'ATTENDED').length;
+    document.getElementById('statPend').textContent = turnosCache.length - atendidos;
+    document.getElementById('statAt').textContent = atendidos;
+  }).catch(() => alert('Error al actualizar el estado.'));
 }
 
 function verFichaDesdeAgenda(doc, nombre) {
   showScreen('pacientes');
-  const p = allPatients.find(x => String(x.documento) === String(doc));
-  if (p) {
-    selectPatient(p);
-  } else {
-    // Paciente en agenda pero no en lista: crear ficha temporal
-    selectPatient({ nombre, documento: doc, obraSocial: '', telefono: '', fechaNacimiento: '', nroAfiliado: '', primerTurno: '' });
-  }
+  const abrir = () => {
+    const p = allPatients.find(x => String(x.documento) === String(doc));
+    selectPatient(p || {nombre, documento: doc, obraSocial:'', telefono:'', fechaNacimiento:'', nroAfiliado:'', antecedentes:''});
+  };
+  if (!allPatients.length) loadPacientes().then(abrir);
+  else abrir();
 }
 
-// ─── PACIENTES ───────────────────────────────────────────────
+// ── PACIENTES ────────────────────────────────────────────────
 function loadPacientes() {
-  callScript({action:'getPacientes'}).then(data => {
+  return callScript({action:'getPacientes'}).then(data => {
     allPatients = Array.isArray(data) ? data : [];
     filteredPatients = [...allPatients];
     renderSidebar();
   }).catch(() => {
-    document.getElementById('patientList').innerHTML = '<div style="padding:16px;font-size:13px;color:var(--text3);">Error al cargar pacientes.</div>';
+    document.getElementById('patientList').innerHTML = '<div style="padding:16px;font-size:13px;color:var(--text3);">Error al cargar.</div>';
   });
 }
-
 function renderSidebar() {
   const list = document.getElementById('patientList');
-  if (!filteredPatients.length) {
-    list.innerHTML = '<div style="padding:16px;font-size:13px;color:var(--text3);">Sin resultados.</div>';
-    return;
-  }
+  if (!filteredPatients.length) { list.innerHTML = '<div style="padding:16px;font-size:13px;color:var(--text3);">Sin resultados.</div>'; return; }
   list.innerHTML = '';
   filteredPatients.forEach(p => {
     const div = document.createElement('div');
     div.className = 'patient-item' + (selectedPatient && selectedPatient.documento === p.documento ? ' active' : '');
-    div.innerHTML = `
-      <div class="avatar">${initials(p.nombre)}</div>
-      <div>
-        <div class="patient-name">${p.nombre}</div>
-        <div class="patient-doc">DNI ${p.documento}</div>
-      </div>`;
+    div.innerHTML = `<div class="avatar">${initials(p.nombre)}</div><div><div class="patient-name">${p.nombre}</div><div class="patient-doc">DNI ${p.documento}</div></div>`;
     div.onclick = () => selectPatient(p);
     list.appendChild(div);
   });
 }
-
 function filterPatients() {
   const q = document.getElementById('searchInput').value.toLowerCase();
-  filteredPatients = allPatients.filter(p =>
-    p.nombre.toLowerCase().includes(q) || String(p.documento).includes(q)
-  );
+  filteredPatients = allPatients.filter(p => p.nombre.toLowerCase().includes(q) || String(p.documento).includes(q));
   renderSidebar();
 }
-
 function selectPatient(p) {
   selectedPatient = p;
   document.getElementById('emptyFicha').style.display = 'none';
   document.getElementById('resumenBox').innerHTML = '';
-  const fv = document.getElementById('fichaView');
-  fv.style.display = 'flex';
+  document.getElementById('fichaView').style.display = 'flex';
   document.getElementById('fichaName').textContent = p.nombre;
   document.getElementById('fichaSub').textContent = `DNI ${p.documento}${p.obraSocial ? '  ·  ' + p.obraSocial : ''}`;
-
   const edad = calcEdad(p.fechaNacimiento);
   document.getElementById('fichaGrid').innerHTML = `
-    <div class="info-card">
-      <div class="info-label">Obra Social</div>
-      <div class="info-value">${p.obraSocial || '—'}</div>
-      <div class="info-edit" onclick="editarDatosPaciente()">✏️ editar</div>
-    </div>
-    <div class="info-card">
-      <div class="info-label">Teléfono</div>
-      <div class="info-value">${p.telefono || '—'}</div>
-      <div class="info-edit" onclick="editarDatosPaciente()">✏️ editar</div>
-    </div>
-    <div class="info-card">
-      <div class="info-label">Nº Afiliado</div>
-      <div class="info-value">${p.nroAfiliado || '—'}</div>
-      <div class="info-edit" onclick="editarDatosPaciente()">✏️ editar</div>
-    </div>
-    <div class="info-card">
-      <div class="info-label">Fecha de nacimiento</div>
-      <div class="info-value">${p.fechaNacimiento ? formatFecha(p.fechaNacimiento) : '—'}</div>
-      <div class="info-edit" onclick="editarDatosPaciente()">✏️ editar</div>
-    </div>
-    <div class="info-card">
-      <div class="info-label">Edad</div>
-      <div class="info-value">${p.fechaNacimiento ? edad : '—'}</div>
-    </div>
-  `;
-  // Antecedentes
+    <div class="info-card"><div class="info-label">Obra Social</div><div class="info-value">${p.obraSocial||'—'}</div><div class="info-edit" onclick="editarDatosPaciente()">✏️ editar</div></div>
+    <div class="info-card"><div class="info-label">Teléfono</div><div class="info-value">${p.telefono||'—'}</div><div class="info-edit" onclick="editarDatosPaciente()">✏️ editar</div></div>
+    <div class="info-card"><div class="info-label">Nº Afiliado</div><div class="info-value">${p.nroAfiliado||'—'}</div><div class="info-edit" onclick="editarDatosPaciente()">✏️ editar</div></div>
+    <div class="info-card"><div class="info-label">Fecha Nacimiento</div><div class="info-value">${p.fechaNacimiento ? formatFecha(p.fechaNacimiento) : '—'}</div><div class="info-edit" onclick="editarDatosPaciente()">✏️ editar</div></div>
+    <div class="info-card"><div class="info-label">Edad</div><div class="info-value">${p.fechaNacimiento ? edad : '—'}</div></div>`;
   document.getElementById('antecedentesBox').innerHTML = `
     <div class="info-card" style="grid-column:1/-1;">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
         <div class="info-label">Antecedentes</div>
         <div class="info-edit" onclick="editarDatosPaciente()">✏️ editar</div>
       </div>
-      <div style="font-size:13px;line-height:1.6;color:var(--text);white-space:pre-wrap;">${p.antecedentes || '<span style="color:var(--text3);">Sin antecedentes cargados.</span>'}</div>
-    </div>
-  `;
-
+      <div style="font-size:13px;line-height:1.6;white-space:pre-wrap;">${p.antecedentes||'<span style="color:var(--text3);">Sin antecedentes cargados.</span>'}</div>
+    </div>`;
+  if (isMobile()) {
+    document.getElementById('pacientesSidebar').classList.add('mobile-hidden');
+    document.getElementById('pacientesMain').classList.add('mobile-visible');
+  }
   loadConsultas(p.documento);
   renderSidebar();
 }
-
+function volverALista() {
+  document.getElementById('pacientesSidebar').classList.remove('mobile-hidden');
+  document.getElementById('pacientesMain').classList.remove('mobile-visible');
+  document.getElementById('fichaView').style.display = 'none';
+  document.getElementById('emptyFicha').style.display = 'flex';
+  selectedPatient = null;
+  renderSidebar();
+}
 function loadConsultas(doc) {
   document.getElementById('consultasBox').innerHTML = '<div style="color:var(--text3);font-size:13px;">Cargando historial...</div>';
-  callScript({action:'getConsultas', documento: doc}).then(data => {
-    renderConsultas(Array.isArray(data) ? data : []);
-  });
+  callScript({action:'getConsultas', documento: doc}).then(data => renderConsultas(Array.isArray(data) ? data : []));
 }
-
 function renderConsultas(consultas) {
   const box = document.getElementById('consultasBox');
-  if (!consultas.length) {
-    box.innerHTML = '<div style="color:var(--text3);font-size:13px;padding:8px 0;">Sin consultas registradas.</div>';
-    return;
-  }
+  if (!consultas.length) { box.innerHTML = '<div style="color:var(--text3);font-size:13px;padding:8px 0;">Sin consultas registradas.</div>'; return; }
   box.innerHTML = consultas.map(c => `
     <div class="consulta-card">
       <div class="consulta-top">
@@ -960,105 +533,386 @@ function renderConsultas(consultas) {
         <span class="consulta-motivo">${c.motivo}</span>
       </div>
       <div class="consulta-grid">
-        <div><div class="c-label">Diagnóstico</div><div class="c-value">${c.diagnostico || '—'}</div></div>
-        <div><div class="c-label">Medicación</div><div class="c-value">${c.medicacion || '—'}</div></div>
+        <div><div class="c-label">Diagnóstico</div><div class="c-value">${c.diagnostico||'—'}</div></div>
+        <div><div class="c-label">Medicación</div><div class="c-value">${c.medicacion||'—'}</div></div>
       </div>
-      <div class="c-label" style="margin-bottom:6px;">Evolución</div>
-      <div class="evol-box">${c.evolucion || '—'}</div>
-    </div>
-  `).join('');
+      <div class="c-label" style="margin-bottom:5px;">Evolución</div>
+      <div class="evol-box">${c.evolucion||'—'}</div>
+    </div>`).join('');
 }
 
-// ─── RESUMEN IA ──────────────────────────────────────────────
+// ── RESUMEN IA ───────────────────────────────────────────────
 async function generarResumen() {
   if (!selectedPatient) return;
   const btn = document.getElementById('btnIA');
   btn.disabled = true;
   const box = document.getElementById('resumenBox');
-  box.innerHTML = `<div class="resumen-card"><div class="spinner-wrap"><div class="spinner"></div> Generando resumen clínico con IA...</div></div>`;
-
+  box.innerHTML = `<div class="resumen-card"><div class="spinner-wrap"><div class="spinner"></div> Generando resumen clínico...</div></div>`;
   const consultas = await callScript({action:'getConsultas', documento: selectedPatient.documento}).catch(() => []);
   const p = selectedPatient;
-  const edad = calcEdad(p.fechaNacimiento);
-
   const historial = consultas.length
-    ? consultas.map(c => `Fecha: ${c.fecha} | Motivo: ${c.motivo} | Diagnóstico: ${c.diagnostico} | Medicación: ${c.medicacion||'ninguna'} | Evolución: ${c.evolucion}`).join('\n')
+    ? consultas.map(c => `Fecha: ${formatFecha(c.fecha)} | Motivo: ${c.motivo} | Diagnóstico: ${c.diagnostico} | Medicación: ${c.medicacion||'ninguna'} | Evolución: ${c.evolucion}`).join('\n')
     : 'Sin consultas registradas.';
-
-  const prompt = `Sos un asistente médico. Generá un resumen clínico breve y útil de este paciente en 2-4 oraciones, en español, en tercera persona. Destacá antecedentes relevantes, diagnósticos previos, medicación habitual y última consulta. Sé conciso y claro para que el médico lo lea antes de la consulta.\n\nPaciente: ${p.nombre}, ${edad}, DNI ${p.documento}, Obra social: ${p.obraSocial||'—'}\n\nHistorial:\n${historial}`;
-
+  const prompt = `Sos un asistente médico de ${DRA.nombre}, ${DRA.especialidad}. Generá un resumen clínico breve y útil de este paciente en 2-4 oraciones, en español, en tercera persona. Destacá antecedentes relevantes, diagnósticos previos, medicación habitual y última consulta.\n\nPaciente: ${p.nombre}, ${calcEdad(p.fechaNacimiento)}, DNI ${p.documento}, Obra social: ${p.obraSocial||'—'}\nAntecedentes: ${p.antecedentes||'ninguno'}\n\nHistorial:\n${historial}`;
   try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({model:'claude-sonnet-4-20250514', max_tokens:1000, messages:[{role:'user',content:prompt}]})
-    });
+    const res = await fetch('https://api.anthropic.com/v1/messages', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({model:'claude-sonnet-4-20250514', max_tokens:1000, messages:[{role:'user',content:prompt}]})});
     const data = await res.json();
-    const texto = data.content?.[0]?.text || 'No se pudo generar el resumen.';
-    box.innerHTML = `<div class="resumen-card"><div class="resumen-header">✨ Resumen clínico</div><div class="resumen-text">${texto}</div></div>`;
+    box.innerHTML = `<div class="resumen-card"><div class="resumen-header">✨ Resumen clínico</div><div class="resumen-text">${data.content?.[0]?.text||'No se pudo generar.'}</div></div>`;
   } catch(e) {
     box.innerHTML = `<div class="resumen-card"><div class="resumen-text">Error al generar el resumen.</div></div>`;
   }
   btn.disabled = false;
 }
 
-// ─── MODALES ─────────────────────────────────────────────────
+// ── MODAL NUEVA CONSULTA CON TABS ────────────────────────────
 function openNuevaConsulta() {
   const hoy = new Date().toLocaleDateString('es-AR');
   document.getElementById('modalRoot').innerHTML = `
-    <div class="modal-overlay">
-      <div class="modal">
-        <div class="modal-title">Nueva consulta — ${selectedPatient.nombre}</div>
+    <div class="modal-overlay"><div class="modal">
+      <div class="modal-title">Nueva consulta — ${selectedPatient.nombre}</div>
+      <div class="modal-tabs">
+        <button class="modal-tab active" onclick="switchTab('tabConsulta')">📋 Consulta</button>
+        <button class="modal-tab" onclick="switchTab('tabLab')">🧪 Laboratorio</button>
+        <button class="modal-tab" onclick="switchTab('tabScores')">📐 Scores</button>
+      </div>
+
+      <!-- TAB CONSULTA -->
+      <div class="tab-content active" id="tabConsulta">
+        <div class="form-group"><label class="form-label">Fecha</label><input class="form-input" id="f_fecha" value="${hoy}"></div>
+        <div class="form-group"><label class="form-label">Motivo de consulta</label><input class="form-input" id="f_motivo" placeholder="Ej: Control, nódulo, resultado de laboratorio..."></div>
         <div class="form-group">
-          <label class="form-label">Fecha</label>
-          <input class="form-input" id="f_fecha" value="${hoy}">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Motivo de consulta</label>
-          <input class="form-input" id="f_motivo" placeholder="Ej: Control, cefalea, dolor abdominal...">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Diagnóstico (buscá por nombre o código CIE-10)</label>
+          <label class="form-label">Diagnóstico (CIE-10)</label>
           <div class="cie-wrap">
-            <input class="form-input" id="f_diag" placeholder="Ej: hipertensión, diabetes, I10..." oninput="buscarCIE(this.value)" autocomplete="off">
+            <input class="form-input" id="f_diag" placeholder="Ej: hipotiroidismo, E03..." oninput="buscarCIE(this.value)" autocomplete="off">
             <div class="cie-results" id="cieResults" style="display:none;"></div>
           </div>
         </div>
-        <div class="form-group">
-          <label class="form-label">Medicación / Tratamiento</label>
-          <input class="form-input" id="f_med" placeholder="Fármaco, dosis, frecuencia">
-        </div>
+        <div class="form-group"><label class="form-label">Medicación / Tratamiento</label><input class="form-input" id="f_med" placeholder="Fármaco, dosis, frecuencia"></div>
         <div class="form-group">
           <label class="form-label">Evolución</label>
-          <textarea class="form-input" id="f_evol" rows="4" placeholder="Descripción de la consulta, hallazgos, indicaciones..."></textarea>
-        </div>
-        <div class="modal-actions">
-          <button class="btn-cancel" onclick="closeModal()">Cancelar</button>
-          <button class="btn-primary" onclick="guardarConsulta()">Guardar consulta</button>
+          <div style="position:relative;">
+            <textarea class="form-input" id="f_evol" rows="5" placeholder="Descripción de la consulta, hallazgos, indicaciones..."></textarea>
+            <button class="mic-btn" id="micEvol" onclick="iniciarDictado('f_evol','micEvol')" title="Dictado por voz">🎤</button>
+          </div>
         </div>
       </div>
-    </div>`;
+
+      <!-- TAB LABORATORIO -->
+      <div class="tab-content" id="tabLab">
+        <div style="font-size:12px;color:var(--text2);margin-bottom:12px;">Completá los valores disponibles. Al guardar se agrega automáticamente a la evolución.</div>
+        <div class="lab-section">
+          <div class="lab-section-title">🩸 Glucemia y Diabetes</div>
+          ${lf('Glucemia ayunas','lab_gluc','mg/dL','<100')}
+          ${lf('HbA1c','lab_hba1c','%','<5.7')}
+          ${lf('Insulina basal','lab_ins','μUI/mL','2-25')}
+          ${lf('Péptido C','lab_pepc','ng/mL','0.5-2')}
+          ${lf('Microalbuminuria','lab_malb','mg/g','<30')}
+        </div>
+        <div class="lab-section">
+          <div class="lab-section-title">🦋 Tiroides</div>
+          ${lf('TSH','lab_tsh','μUI/mL','0.4-4.0')}
+          ${lf('T4 libre','lab_t4l','ng/dL','0.8-1.8')}
+          ${lf('T3 libre','lab_t3l','pg/mL','2.3-4.2')}
+          ${lf('Ac Anti-TPO','lab_atpo','UI/mL','<35')}
+          ${lf('Ac Anti-Tg','lab_atg','UI/mL','<115')}
+          ${lf('Tiroglobulina','lab_tg','ng/mL','<55')}
+        </div>
+        <div class="lab-section">
+          <div class="lab-section-title">💊 Lípidos</div>
+          ${lf('Colesterol total','lab_ct','mg/dL','<200')}
+          ${lf('LDL','lab_ldl','mg/dL','<100')}
+          ${lf('HDL','lab_hdl','mg/dL','>40')}
+          ${lf('Triglicéridos','lab_trig','mg/dL','<150')}
+          ${lf('Col no-HDL','lab_nhdl','mg/dL','<130')}
+        </div>
+        <div class="lab-section">
+          <div class="lab-section-title">🫀 Suprarrenal / Hipófisis</div>
+          ${lf('Cortisol basal','lab_cort','μg/dL','6-23')}
+          ${lf('ACTH','lab_acth','pg/mL','10-60')}
+          ${lf('Aldosterona','lab_aldo','ng/dL','4-31')}
+          ${lf('Prolactina','lab_prl','ng/mL','<20')}
+          ${lf('IGF-1','lab_igf','ng/mL','var')}
+          ${lf('DHEA-S','lab_dhea','μg/dL','var')}
+        </div>
+        <div class="lab-section">
+          <div class="lab-section-title">🧪 Renal / Hepática / Iones</div>
+          ${lf('Creatinina','lab_creat','mg/dL','0.6-1.2')}
+          ${lf('TGO','lab_tgo','U/L','<40')}
+          ${lf('TGP','lab_tgp','U/L','<41')}
+          ${lf('Calcio','lab_ca','mg/dL','8.5-10.5')}
+          ${lf('Fósforo','lab_fosf','mg/dL','2.5-4.5')}
+          ${lf('PTH','lab_pth','pg/mL','15-65')}
+          ${lf('Vitamina D','lab_vitd','ng/mL','>30')}
+        </div>
+        <div class="lab-section">
+          <div class="lab-section-title">⚧ Gónadas</div>
+          ${lf('LH','lab_lh','mUI/mL','var')}
+          ${lf('FSH','lab_fsh','mUI/mL','var')}
+          ${lf('Estradiol','lab_e2','pg/mL','var')}
+          ${lf('Testosterona','lab_testo','ng/dL','var')}
+          ${lf('Progesterona','lab_prog','ng/mL','var')}
+        </div>
+        <button onclick="agregarLabAEvolucion()" style="width:100%;padding:8px;font-size:13px;font-family:'DM Sans',sans-serif;font-weight:500;background:var(--accent);color:#fff;border:none;border-radius:var(--radius-sm);cursor:pointer;margin-top:4px;">
+          ✓ Agregar laboratorio a la evolución
+        </button>
+      </div>
+
+      <!-- TAB SCORES -->
+      <div class="tab-content" id="tabScores">
+        <div style="font-size:12px;color:var(--text2);margin-bottom:12px;">Calculá el score y agregalo a la evolución con un clic.</div>
+
+        <div class="score-section">
+          <div class="score-title">⚖️ IMC</div>
+          <div class="score-row">
+            <div class="score-field"><label>Peso (kg)</label><input type="number" id="imc_peso" step="0.1" placeholder="70"></div>
+            <div class="score-field"><label>Talla (cm)</label><input type="number" id="imc_talla" step="1" placeholder="165"></div>
+          </div>
+          <button class="btn-score" onclick="calcIMC()">Calcular IMC</button>
+          <div class="score-result" id="res_imc" style="display:none;"></div>
+          <button class="btn-agregar" id="agrIMC" style="display:none;" onclick="agregarScoreAEvolucion('res_imc')">+ Agregar a evolución</button>
+        </div>
+
+        <div class="score-section">
+          <div class="score-title">📏 Índice Cintura/Talla</div>
+          <div class="score-row">
+            <div class="score-field"><label>Cintura (cm)</label><input type="number" id="ct_cin" step="0.1" placeholder="90"></div>
+            <div class="score-field"><label>Talla (cm)</label><input type="number" id="ct_tal" step="1" placeholder="165"></div>
+          </div>
+          <button class="btn-score" onclick="calcCT()">Calcular ICT</button>
+          <div class="score-result" id="res_ct" style="display:none;"></div>
+          <button class="btn-agregar" id="agrCT" style="display:none;" onclick="agregarScoreAEvolucion('res_ct')">+ Agregar a evolución</button>
+        </div>
+
+        <div class="score-section">
+          <div class="score-title">🍬 HOMA-IR</div>
+          <div class="score-row">
+            <div class="score-field"><label>Glucemia ayunas (mg/dL)</label><input type="number" id="homa_g" step="1" placeholder="100"></div>
+            <div class="score-field"><label>Insulina basal (μUI/mL)</label><input type="number" id="homa_i" step="0.1" placeholder="10"></div>
+          </div>
+          <button class="btn-score" onclick="calcHOMA()">Calcular HOMA-IR</button>
+          <div class="score-result" id="res_homa" style="display:none;"></div>
+          <button class="btn-agregar" id="agrHOMA" style="display:none;" onclick="agregarScoreAEvolucion('res_homa')">+ Agregar a evolución</button>
+        </div>
+
+        <div class="score-section">
+          <div class="score-title">🫘 Filtrado Glomerular CKD-EPI</div>
+          <div class="score-row">
+            <div class="score-field"><label>Creatinina (mg/dL)</label><input type="number" id="ckd_c" step="0.01" placeholder="0.9"></div>
+            <div class="score-field"><label>Edad (años)</label><input type="number" id="ckd_e" step="1" placeholder="55"></div>
+          </div>
+          <div class="score-field"><label>Sexo</label><select id="ckd_s"><option value="F">Femenino</option><option value="M">Masculino</option></select></div>
+          <button class="btn-score" onclick="calcCKD()">Calcular TFG</button>
+          <div class="score-result" id="res_ckd" style="display:none;"></div>
+          <button class="btn-agregar" id="agrCKD" style="display:none;" onclick="agregarScoreAEvolucion('res_ckd')">+ Agregar a evolución</button>
+        </div>
+
+        <div class="score-section">
+          <div class="score-title">🦋 TIRADS ACR</div>
+          <div class="score-field"><label>Composición</label>
+            <select id="tir_comp"><option value="0">Quiste puro (0)</option><option value="0">Espongiforme (0)</option><option value="1">Mixto (1)</option><option value="2">Sólido (2)</option></select></div>
+          <div class="score-field"><label>Ecogenicidad</label>
+            <select id="tir_eco"><option value="0">Anecóico (0)</option><option value="1">Hiperecóico/isoecoico (1)</option><option value="2">Hipoecoico (2)</option><option value="3">Muy hipoecoico (3)</option></select></div>
+          <div class="score-field"><label>Forma</label>
+            <select id="tir_forma"><option value="0">Más ancho que alto (0)</option><option value="3">Más alto que ancho (3)</option></select></div>
+          <div class="score-field"><label>Márgenes</label>
+            <select id="tir_marg"><option value="0">Liso (0)</option><option value="0">Mal definido (0)</option><option value="2">Lobulado/irregular (2)</option><option value="3">Extensión extratiroidea (3)</option></select></div>
+          <div class="score-field"><label>Focos ecogénicos</label>
+            <select id="tir_focos"><option value="0">Ninguno (0)</option><option value="1">Macrocalcificaciones (1)</option><option value="1">Calcif. periférica (1)</option><option value="2">Puntiformes (2)</option></select></div>
+          <button class="btn-score" onclick="calcTIRADS()">Calcular TIRADS</button>
+          <div class="score-result" id="res_tirads" style="display:none;"></div>
+          <button class="btn-agregar" id="agrTIRADS" style="display:none;" onclick="agregarScoreAEvolucion('res_tirads')">+ Agregar a evolución</button>
+        </div>
+
+        <div class="score-section">
+          <div class="score-title">❤️ SCORE2</div>
+          <div class="score-row">
+            <div class="score-field"><label>Edad (años)</label><input type="number" id="sc_e" step="1" placeholder="55"></div>
+            <div class="score-field"><label>Col no-HDL (mg/dL)</label><input type="number" id="sc_n" step="1" placeholder="130"></div>
+          </div>
+          <div class="score-row">
+            <div class="score-field"><label>PAS (mmHg)</label><input type="number" id="sc_p" step="1" placeholder="130"></div>
+            <div class="score-field"><label>Sexo</label><select id="sc_s"><option value="F">Femenino</option><option value="M">Masculino</option></select></div>
+          </div>
+          <div class="score-field"><label>Tabaquismo</label><select id="sc_t"><option value="0">No fumador</option><option value="1">Fumador</option></select></div>
+          <button class="btn-score" onclick="calcSCORE2()">Calcular SCORE2</button>
+          <div class="score-result" id="res_score2" style="display:none;"></div>
+          <button class="btn-agregar" id="agrSCORE2" style="display:none;" onclick="agregarScoreAEvolucion('res_score2')">+ Agregar a evolución</button>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn-cancel" onclick="closeModal()">Cancelar</button>
+        <button class="btn-primary" onclick="guardarConsulta()">Guardar consulta</button>
+      </div>
+    </div></div>`;
 }
 
+// ── HELPERS MODAL ─────────────────────────────────────────────
+function lf(label, id, unit, ref) {
+  return `<div class="lab-field"><label>${label}</label><input type="number" id="${id}" step="any" placeholder="—"><span class="lab-unit">${unit}</span><span class="lab-ref">${ref}</span></div>`;
+}
+
+function switchTab(tabId) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.modal-tab').forEach(b => b.classList.remove('active'));
+  document.getElementById(tabId).classList.add('active');
+  const idx = ['tabConsulta','tabLab','tabScores'].indexOf(tabId);
+  document.querySelectorAll('.modal-tab')[idx].classList.add('active');
+}
+
+function agregarLabAEvolucion() {
+  const campos = [
+    {id:'lab_gluc',label:'Glucemia'},  {id:'lab_hba1c',label:'HbA1c'},
+    {id:'lab_ins',label:'Insulina'},   {id:'lab_pepc',label:'Péptido C'},
+    {id:'lab_malb',label:'Microalbuminuria'},
+    {id:'lab_tsh',label:'TSH'},        {id:'lab_t4l',label:'T4L'},
+    {id:'lab_t3l',label:'T3L'},        {id:'lab_atpo',label:'Anti-TPO'},
+    {id:'lab_atg',label:'Anti-Tg'},    {id:'lab_tg',label:'Tiroglobulina'},
+    {id:'lab_ct',label:'Col total'},   {id:'lab_ldl',label:'LDL'},
+    {id:'lab_hdl',label:'HDL'},        {id:'lab_trig',label:'TG'},
+    {id:'lab_nhdl',label:'Col no-HDL'},
+    {id:'lab_cort',label:'Cortisol'},  {id:'lab_acth',label:'ACTH'},
+    {id:'lab_aldo',label:'Aldosterona'},{id:'lab_prl',label:'Prolactina'},
+    {id:'lab_igf',label:'IGF-1'},      {id:'lab_dhea',label:'DHEA-S'},
+    {id:'lab_creat',label:'Creatinina'},{id:'lab_tgo',label:'TGO'},
+    {id:'lab_tgp',label:'TGP'},        {id:'lab_ca',label:'Calcio'},
+    {id:'lab_fosf',label:'Fósforo'},   {id:'lab_pth',label:'PTH'},
+    {id:'lab_vitd',label:'Vit D'},
+    {id:'lab_lh',label:'LH'},          {id:'lab_fsh',label:'FSH'},
+    {id:'lab_e2',label:'Estradiol'},   {id:'lab_testo',label:'Testosterona'},
+    {id:'lab_prog',label:'Progesterona'},
+  ];
+  const lineas = campos.filter(c => { const el=document.getElementById(c.id); return el && el.value; }).map(c => `${c.label}: ${document.getElementById(c.id).value}`);
+  if (!lineas.length) { alert('Completá al menos un valor.'); return; }
+  const texto = 'LAB: ' + lineas.join(' | ');
+  const evol = document.getElementById('f_evol');
+  evol.value = evol.value ? evol.value + '\n' + texto : texto;
+  switchTab('tabConsulta');
+  if (!document.getElementById('f_motivo').value) document.getElementById('f_motivo').value = 'Laboratorio';
+}
+
+function showResult(id, texto, tipo, btnId) {
+  const el = document.getElementById(id);
+  el.style.display = 'block';
+  el.className = 'score-result score-' + tipo;
+  el.textContent = texto;
+  el.dataset.texto = texto;
+  if (btnId) document.getElementById(btnId).style.display = 'inline-block';
+}
+
+function agregarScoreAEvolucion(resId) {
+  const el = document.getElementById(resId);
+  if (!el || !el.dataset.texto) return;
+  const evol = document.getElementById('f_evol');
+  evol.value = evol.value ? evol.value + '\n' + el.dataset.texto : el.dataset.texto;
+  switchTab('tabConsulta');
+}
+
+// ── CALCULADORAS ─────────────────────────────────────────────
+function calcIMC() {
+  const p = parseFloat(document.getElementById('imc_peso').value);
+  const t = parseFloat(document.getElementById('imc_talla').value) / 100;
+  if (!p || !t) return;
+  const imc = (p/(t*t)).toFixed(1);
+  let cat, tipo;
+  if (imc<18.5){cat='Bajo peso';tipo='warn';}
+  else if (imc<25){cat='Normal';tipo='ok';}
+  else if (imc<30){cat='Sobrepeso';tipo='warn';}
+  else if (imc<35){cat='Obesidad G1';tipo='bad';}
+  else if (imc<40){cat='Obesidad G2';tipo='bad';}
+  else{cat='Obesidad G3';tipo='bad';}
+  showResult('res_imc',`IMC: ${imc} kg/m² — ${cat}`,tipo,'agrIMC');
+}
+function calcCT() {
+  const c = parseFloat(document.getElementById('ct_cin').value);
+  const t = parseFloat(document.getElementById('ct_tal').value);
+  if (!c||!t) return;
+  const idx = (c/t).toFixed(2);
+  let msg,tipo;
+  if (idx<0.4){msg='Delgado';tipo='warn';}
+  else if (idx<=0.5){msg='Saludable';tipo='ok';}
+  else if (idx<=0.6){msg='Sobrepeso/riesgo aumentado';tipo='warn';}
+  else{msg='Obesidad/riesgo alto';tipo='bad';}
+  showResult('res_ct',`ICT: ${idx} — ${msg}`,tipo,'agrCT');
+}
+function calcHOMA() {
+  const g = parseFloat(document.getElementById('homa_g').value);
+  const i = parseFloat(document.getElementById('homa_i').value);
+  if (!g||!i) return;
+  const h = ((g*i)/405).toFixed(2);
+  let msg,tipo;
+  if (h<2.5){msg='Sin resistencia insulínica';tipo='ok';}
+  else if (h<3.8){msg='Resistencia insulínica moderada';tipo='warn';}
+  else{msg='Resistencia insulínica severa';tipo='bad';}
+  showResult('res_homa',`HOMA-IR: ${h} — ${msg}`,tipo,'agrHOMA');
+}
+function calcCKD() {
+  const cr = parseFloat(document.getElementById('ckd_c').value);
+  const ed = parseFloat(document.getElementById('ckd_e').value);
+  const sx = document.getElementById('ckd_s').value;
+  if (!cr||!ed) return;
+  const k = sx==='F'?0.7:0.9, a = sx==='F'?-0.241:-0.302, sf = sx==='F'?1.012:1.0;
+  const r = cr/k;
+  const egfr = Math.round(142*Math.pow(Math.min(r,1),a)*Math.pow(Math.max(r,1),-1.2)*Math.pow(0.9938,ed)*sf);
+  let est,tipo;
+  if (egfr>=90){est='G1 Normal';tipo='ok';}
+  else if (egfr>=60){est='G2 Levemente disminuido';tipo='ok';}
+  else if (egfr>=45){est='G3a';tipo='warn';}
+  else if (egfr>=30){est='G3b';tipo='warn';}
+  else if (egfr>=15){est='G4 Severo';tipo='bad';}
+  else{est='G5 Falla renal';tipo='bad';}
+  showResult('res_ckd',`TFG: ${egfr} mL/min/1.73m² — ${est}`,tipo,'agrCKD');
+}
+function calcTIRADS() {
+  const total = ['tir_comp','tir_eco','tir_forma','tir_marg','tir_focos'].reduce((s,id)=>s+parseInt(document.getElementById(id).value||0),0);
+  let cat,rec,tipo;
+  if (total<=1){cat='TR1';rec='Benigno, sin seguimiento';tipo='ok';}
+  else if (total===2){cat='TR2';rec='Sin seguimiento recomendado';tipo='ok';}
+  else if (total<=4){cat='TR3';rec='PAAF si ≥2.5cm / Eco si ≥1.5cm';tipo='warn';}
+  else if (total<=6){cat='TR4';rec='PAAF si ≥1.5cm / Eco si ≥1cm';tipo='warn';}
+  else{cat='TR5';rec='PAAF si ≥1cm / Eco si ≥0.5cm';tipo='bad';}
+  showResult('res_tirads',`TIRADS ${cat} (${total}pts) — ${rec}`,tipo,'agrTIRADS');
+}
+function calcSCORE2() {
+  const ed = parseFloat(document.getElementById('sc_e').value);
+  const nh = parseFloat(document.getElementById('sc_n').value);
+  const pa = parseFloat(document.getElementById('sc_p').value);
+  const sx = document.getElementById('sc_s').value;
+  const tb = parseInt(document.getElementById('sc_t').value);
+  if (!ed||!nh||!pa) return;
+  const nm = nh/38.67;
+  let sc;
+  if (sx==='M') {
+    const b = Math.exp(-0.5699*Math.exp(0.74*(ed-60)/5)-0.0953*Math.exp(0.74*(ed-60)/5)*(nm-3.5)-0.0736*Math.exp(0.74*(ed-60)/5)*(pa-120)/20+0.4745*tb);
+    sc = Math.round((1-Math.pow(0.9605,b))*100);
+  } else {
+    const b = Math.exp(-0.7401*Math.exp(0.74*(ed-60)/5)-0.0657*Math.exp(0.74*(ed-60)/5)*(nm-3.5)-0.0618*Math.exp(0.74*(ed-60)/5)*(pa-120)/20+0.3642*tb);
+    sc = Math.round((1-Math.pow(0.9776,b))*100);
+  }
+  sc = Math.max(0,Math.min(sc,100));
+  let riesgo,tipo;
+  const umbralB = ed<50?2.5:5, umbralM = ed<50?7.5:10;
+  if (sc<umbralB){riesgo='Bajo';tipo='ok';}
+  else if (sc<umbralM){riesgo='Moderado';tipo='warn';}
+  else{riesgo='Alto/Muy alto';tipo='bad';}
+  showResult('res_score2',`SCORE2: ${sc}% — Riesgo ${riesgo}`,tipo,'agrSCORE2');
+}
+
+// ── CIE10 ────────────────────────────────────────────────────
 function buscarCIE(q) {
   const res = document.getElementById('cieResults');
-  if (!q || q.length < 2) { res.style.display = 'none'; return; }
-  const matches = CIE10.filter(c =>
-    c.desc.toLowerCase().includes(q.toLowerCase()) || c.code.toLowerCase().includes(q.toLowerCase())
-  ).slice(0, 8);
-  if (!matches.length) { res.style.display = 'none'; return; }
-  res.style.display = 'block';
-  res.innerHTML = matches.map(c => `
-    <div class="cie-item" onclick="selectCIE('${c.code}','${c.desc.replace(/'/g,"\\'")}')">
-      <span class="cie-code">${c.code}</span>${c.desc}
-    </div>`).join('');
+  if (!q||q.length<2){res.style.display='none';return;}
+  const matches = CIE10.filter(c=>c.desc.toLowerCase().includes(q.toLowerCase())||c.code.toLowerCase().includes(q.toLowerCase())).slice(0,8);
+  if (!matches.length){res.style.display='none';return;}
+  res.style.display='block';
+  res.innerHTML = matches.map(c=>`<div class="cie-item" onclick="selectCIE('${c.code}','${c.desc.replace(/'/g,"\\'")}')"><span class="cie-code">${c.code}</span>${c.desc}</div>`).join('');
 }
-
-function selectCIE(code, desc) {
+function selectCIE(code,desc) {
   document.getElementById('f_diag').value = `${code} - ${desc}`;
-  document.getElementById('cieResults').style.display = 'none';
+  document.getElementById('cieResults').style.display='none';
 }
 
+// ── GUARDAR CONSULTA ─────────────────────────────────────────
 function guardarConsulta() {
   const consulta = {
     fecha: document.getElementById('f_fecha').value,
@@ -1074,78 +928,104 @@ function guardarConsulta() {
   callScript({action:'guardarConsulta', ...consulta}).then(() => {
     loadConsultas(selectedPatient.documento);
     document.getElementById('resumenBox').innerHTML = '';
+    // Actualizar estado en agenda si hay turno del día
+    actualizarEstadoDesdeConsulta(selectedPatient.documento);
   });
 }
 
+function actualizarEstadoDesdeConsulta(doc) {
+  const idx = turnosCache.findIndex(t => String(t.documento) === String(doc));
+  if (idx === -1) return;
+  const t = turnosCache[idx];
+  if ((t.estado||'').toUpperCase() !== 'ATTENDED') {
+    callScript({action:'actualizarEstadoTurno', idBooking: t.idBooking, estado:'ATTENDED'}).then(() => {
+      turnosCache[idx].estado = 'ATTENDED';
+    });
+  }
+}
+
+// ── EDITAR PACIENTE ──────────────────────────────────────────
 function editarDatosPaciente() {
   const p = selectedPatient;
   document.getElementById('modalRoot').innerHTML = `
-    <div class="modal-overlay">
-      <div class="modal">
-        <div class="modal-title">Editar datos — ${p.nombre}</div>
-        <div class="form-row">
-          <div class="form-group">
-            <label class="form-label">Obra Social</label>
-            <input class="form-input" id="ed_os" value="${p.obraSocial || ''}" placeholder="Obra social">
-          </div>
-          <div class="form-group">
-            <label class="form-label">Teléfono</label>
-            <input class="form-input" id="ed_tel" value="${p.telefono || ''}" placeholder="Teléfono">
-          </div>
-        </div>
-        <div class="form-row">
-          <div class="form-group">
-            <label class="form-label">Fecha de nacimiento (DD/MM/AAAA)</label>
-            <input class="form-input" id="ed_fn" value="${p.fechaNacimiento || ''}" placeholder="DD/MM/AAAA">
-          </div>
-          <div class="form-group">
-            <label class="form-label">Nº de afiliado</label>
-            <input class="form-input" id="ed_af" value="${p.nroAfiliado || ''}" placeholder="Número de afiliado">
-          </div>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Antecedentes</label>
-          <textarea class="form-input" id="ed_ant" rows="4" placeholder="HTA, DBT, cirugías previas, alergias, antecedentes familiares...">${p.antecedentes || ''}</textarea>
-        </div>
-        <div class="modal-actions">
-          <button class="btn-cancel" onclick="closeModal()">Cancelar</button>
-          <button class="btn-primary" onclick="guardarDatosPaciente()">Guardar</button>
+    <div class="modal-overlay"><div class="modal">
+      <div class="modal-title">Editar datos — ${p.nombre}</div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Obra Social</label><input class="form-input" id="ed_os" value="${p.obraSocial||''}"></div>
+        <div class="form-group"><label class="form-label">Teléfono</label><input class="form-input" id="ed_tel" value="${p.telefono||''}"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Fecha de nacimiento (DD/MM/AAAA)</label><input class="form-input" id="ed_fn" value="${p.fechaNacimiento||''}" placeholder="DD/MM/AAAA"></div>
+        <div class="form-group"><label class="form-label">Nº de afiliado</label><input class="form-input" id="ed_af" value="${p.nroAfiliado||''}"></div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Antecedentes</label>
+        <div style="position:relative;">
+          <textarea class="form-input" id="ed_ant" rows="4" placeholder="HTA, cirugías previas, alergias, antecedentes familiares...">${p.antecedentes||''}</textarea>
+          <button class="mic-btn" id="micAnt" onclick="iniciarDictado('ed_ant','micAnt')" title="Dictado">🎤</button>
         </div>
       </div>
-    </div>`;
+      <div class="modal-actions">
+        <button class="btn-cancel" onclick="closeModal()">Cancelar</button>
+        <button class="btn-primary" onclick="guardarDatosPaciente()">Guardar</button>
+      </div>
+    </div></div>`;
 }
-
 function guardarDatosPaciente() {
-  const fn = document.getElementById('ed_fn').value;
-  const af = document.getElementById('ed_af').value;
-  const os = document.getElementById('ed_os').value;
-  const tel = document.getElementById('ed_tel').value;
-  const ant = document.getElementById('ed_ant').value;
-  selectedPatient.fechaNacimiento = fn;
-  selectedPatient.nroAfiliado = af;
-  selectedPatient.obraSocial = os;
-  selectedPatient.telefono = tel;
-  selectedPatient.antecedentes = ant;
+  const fn=document.getElementById('ed_fn').value, af=document.getElementById('ed_af').value;
+  const os=document.getElementById('ed_os').value, tel=document.getElementById('ed_tel').value;
+  const ant=document.getElementById('ed_ant').value;
+  selectedPatient = {...selectedPatient, fechaNacimiento:fn, nroAfiliado:af, obraSocial:os, telefono:tel, antecedentes:ant};
   closeModal();
-  callScript({action:'actualizarPaciente', documento: selectedPatient.documento, fechaNacimiento: fn, nroAfiliado: af, obraSocial: os, telefono: tel, antecedentes: ant});
+  callScript({action:'actualizarPaciente', documento:selectedPatient.documento, fechaNacimiento:fn, nroAfiliado:af, obraSocial:os, telefono:tel, antecedentes:ant});
   selectPatient(selectedPatient);
 }
+function closeModal() { document.getElementById('modalRoot').innerHTML=''; }
 
-function closeModal() { document.getElementById('modalRoot').innerHTML = ''; }
-
-// ─── NAVEGACIÓN ──────────────────────────────────────────────
-function showScreen(name) {
-  document.getElementById('screenAgenda').classList.toggle('active', name === 'agenda');
-  document.getElementById('screenPacientes').classList.toggle('active', name === 'pacientes');
-  document.getElementById('navAgenda').classList.toggle('active', name === 'agenda');
-  document.getElementById('navPacientes').classList.toggle('active', name === 'pacientes');
-  if (name === 'pacientes' && !allPatients.length) loadPacientes();
+// ── DICTADO POR VOZ ──────────────────────────────────────────
+let reconocimiento = null;
+function iniciarDictado(campoId, btnId) {
+  if (!('webkitSpeechRecognition' in window)&&!('SpeechRecognition' in window)) {
+    alert('Dictado no disponible en este navegador. Usá Chrome.');
+    return;
+  }
+  if (reconocimiento) { reconocimiento.stop(); reconocimiento=null; if(btnId){const b=document.getElementById(btnId);if(b){b.classList.remove('recording');b.textContent='🎤';}} return; }
+  const SR = window.SpeechRecognition||window.webkitSpeechRecognition;
+  reconocimiento = new SR();
+  reconocimiento.lang='es-AR';
+  reconocimiento.continuous=true;
+  reconocimiento.interimResults=false;
+  if(btnId){const b=document.getElementById(btnId);if(b){b.classList.add('recording');b.textContent='⏹';}}
+  reconocimiento.onresult = e => {
+    const texto = Array.from(e.results).map(r=>r[0].transcript).join(' ');
+    const campo = document.getElementById(campoId);
+    if(campo) campo.value = (campo.value?campo.value+' ':'')+texto;
+  };
+  reconocimiento.onerror = () => { reconocimiento=null; if(btnId){const b=document.getElementById(btnId);if(b){b.classList.remove('recording');b.textContent='🎤';}} };
+  reconocimiento.onend = () => { reconocimiento=null; if(btnId){const b=document.getElementById(btnId);if(b){b.classList.remove('recording');b.textContent='🎤';}} };
+  reconocimiento.start();
 }
 
-// ─── INIT ─────────────────────────────────────────────────────
+// ── NAVEGACIÓN ───────────────────────────────────────────────
+function showScreen(name) {
+  ['agenda','pacientes'].forEach(s => {
+    const scr=document.getElementById('screen'+s.charAt(0).toUpperCase()+s.slice(1));
+    const btn=document.getElementById('nav'+s.charAt(0).toUpperCase()+s.slice(1));
+    if(scr) scr.classList.toggle('active', s===name);
+    if(btn) btn.classList.toggle('active', s===name);
+  });
+  if (name==='pacientes' && !allPatients.length) loadPacientes();
+}
+
+// ── APPS SCRIPT: actualizar estado turno ─────────────────────
+// Esta función requiere agregar actualizarEstadoTurno en Apps Script
+
+// ── INIT ─────────────────────────────────────────────────────
 setTopbar();
 document.getElementById('fechaAgenda').value = getTodayStr();
 loadAgenda();
 </script>
 </body>
 </html>
+HTMLEOF
+echo "done"
