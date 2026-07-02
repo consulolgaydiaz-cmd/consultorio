@@ -467,7 +467,7 @@ function selectPatient(p) {
 function loadConsultas(doc) {
   const box = document.getElementById('consultasBox');
   box.innerHTML = '<div class="loading-msg">⏳ Cargando historial clínico...</div>';
-  callScript({action:'getConsultasPorPaciente', documento: doc}).then(data => {
+  callScript({action:'getConsultas', documento: doc}).then(data => {
     cacheConsultasActual = Array.isArray(data) ? data : [];
     if (!cacheConsultasActual.length) { box.innerHTML = '<div class="loading-msg">📋 No hay consultas registradas para este paciente.</div>'; return; }
     box.innerHTML = '';
@@ -540,9 +540,12 @@ function openNuevaConsultaInline() {
           <label class="form-label">Motivo de Consulta</label>
           <input type="text" id="c_motivo" class="form-input" placeholder="Ej. Control de evolución">
         </div>
-        <div class="form-group">
-          <label class="form-label">Evolución Clínica</label>
-          <textarea id="c_evolucion" class="form-input" style="min-height:180px;" placeholder="Escribí la anamnesis o examen clínico aquí..."></textarea>
+       <div class="form-group">
+          <label class="form-label" style="display:flex; justify-content:space-between; align-items:center;">
+            Evolución Clínica
+            <button type="button" id="btnMicEvolucion" onclick="toggleDictation()" style="background:var(--accent-light); border:1px solid var(--accent); border-radius:var(--radius-sm); padding:4px 10px; cursor:pointer; font-size:12px; font-family:'DM Sans',sans-serif; font-weight:500; color:var(--accent);" title="Dictar por voz">🎤 Activar Micrófono</button>
+          </label>
+          <textarea id="c_evolucion" class="form-input" style="min-height:180px;" placeholder="Escribí o dictá la anamnesis o examen clínico aquí..."></textarea>
         </div>
         <div class="form-group">
           <label class="form-label">Diagnóstico (CIE-10)</label>
@@ -885,7 +888,77 @@ function showScreen(name) {
   });
   if (name==='pacientes' && !allPatients.length) loadPacientes();
 }
+// ── LÓGICA DE RECONOCIMIENTO DE VOZ (DICTADO) ────────────────
+let recognition;
+let isDictating = false;
 
+function toggleDictation() {
+  const btn = document.getElementById('btnMicEvolucion');
+  const textarea = document.getElementById('c_evolucion');
+
+  if (isDictating) {
+    if (recognition) recognition.stop();
+    return;
+  }
+
+  // Verifica si el navegador soporta la API
+  if (!('webkitSpeechRecognition' in window)) {
+    alert('Tu navegador no soporta el dictado por voz. Te sugerimos usar Google Chrome.');
+    return;
+  }
+
+  recognition = new webkitSpeechRecognition();
+  recognition.lang = 'es-AR'; // Configurado para acento local
+  recognition.continuous = true;
+  recognition.interimResults = true; // Muestra los resultados mientras hablas
+
+  recognition.onstart = function() {
+    isDictating = true;
+    btn.innerHTML = '🔴 Escuchando... (Click para pausar)';
+    btn.style.background = 'var(--red-light)';
+    btn.style.color = 'var(--red)';
+    btn.style.borderColor = 'var(--red)';
+  };
+
+  recognition.onresult = function(event) {
+    let finalTranscript = '';
+
+    for (let i = event.resultIndex; i < event.results.length; ++i) {
+      if (event.results[i].isFinal) {
+        finalTranscript += event.results[i][0].transcript;
+      }
+    }
+    
+    if (finalTranscript) {
+      // Agrega un espacio si el textarea ya tiene texto y no termina en espacio
+      const currentText = textarea.value;
+      const needsSpace = currentText.length > 0 && !currentText.endsWith(' ') && !currentText.endsWith('\n');
+      textarea.value += (needsSpace ? ' ' : '') + finalTranscript;
+    }
+  };
+
+  recognition.onerror = function(event) {
+    console.error('Error de reconocimiento de voz:', event.error);
+    resetMicButton();
+  };
+
+  recognition.onend = function() {
+    resetMicButton();
+  };
+
+  recognition.start();
+}
+
+function resetMicButton() {
+  isDictating = false;
+  const btn = document.getElementById('btnMicEvolucion');
+  if (btn) {
+    btn.innerHTML = '🎤 Activar Micrófono';
+    btn.style.background = 'var(--accent-light)';
+    btn.style.color = 'var(--accent)';
+    btn.style.borderColor = 'var(--accent)';
+  }
+}
 window.onload = () => {
   setTopbar();
   irAHoy();
