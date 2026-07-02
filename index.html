@@ -59,10 +59,10 @@
   .btn-ficha { padding: 6px 12px; font-size: 12px; font-family: 'DM Sans', sans-serif; font-weight: 500; background: var(--accent-light); color: var(--accent); border: none; border-radius: var(--radius-sm); cursor: pointer; white-space: nowrap; }
   .loading-msg { text-align: center; padding: 40px; color: var(--text2); font-size: 14px; }
 
-  /* PACIENTES */
-  .pacientes-screen { flex-direction: row; }
-  .sidebar { width: 250px; min-width: 250px; background: var(--surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; }
-  .sidebar-top { padding: 14px; border-bottom: 1px solid var(--border); }
+  /* PACIENTES (ESTRUCTURA CORREGIDA) */
+  .pacientes-screen { flex-direction: row; width: 100%; height: 100%; overflow: hidden; }
+  .sidebar { width: 280px; min-width: 280px; background: var(--surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; height: 100%; overflow: hidden; }
+  .sidebar-top { padding: 14px; border-bottom: 1px solid var(--border); flex-shrink: 0; }
   .sidebar-label { font-size: 11px; font-weight: 600; color: var(--text3); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; }
   .search-wrap { position: relative; }
   .search-icon { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--text3); font-size: 13px; }
@@ -77,35 +77,36 @@
   .patient-name { font-size: 13px; font-weight: 500; }
   .patient-doc { font-size: 11px; color: var(--text3); margin-top: 1px; }
 
-  /* FICHA */
-  .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+  /* FICHA DE HISTORIA CLÍNICA */
+  .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; height: 100%; background: var(--bg); }
   .main-header { padding: 14px 20px; border-bottom: 1px solid var(--border); background: var(--surface); display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; flex-shrink: 0; }
   .main-title { font-size: 17px; font-weight: 600; }
   .main-sub { font-size: 12px; color: var(--text2); margin-top: 2px; }
   .header-btns { display: flex; gap: 8px; flex-shrink: 0; flex-wrap: wrap; }
-  .btn-ia { padding: 6px 12px; font-size: 12px; font-family: 'DM Sans', sans-serif; font-weight: 500; background: transparent; border: 1.5px solid var(--accent); color: var(--accent); border-radius: var(--radius-sm); cursor: pointer; display: flex; align-items: center; gap: 5px; }
   .btn-primary { padding: 6px 14px; font-size: 12px; font-family: 'DM Sans', sans-serif; font-weight: 500; background: var(--accent); color: #fff; border: none; border-radius: var(--radius-sm); cursor: pointer; }
   .btn-primary:hover { background: var(--accent-dark); }
-  .content { flex: 1; overflow-y: auto; padding: 16px 20px; display: flex; flex-direction: column; gap: 12px; }
-  .info-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+  .btn-secondary { padding: 6px 12px; font-size: 12px; font-family: 'DM Sans', sans-serif; font-weight: 500; background: var(--surface2); color: var(--text); border: 1px solid var(--border); border-radius: var(--radius-sm); cursor: pointer; }
+  
+  /* CONTENIDO CON SCROLL INTERNO */
+  .content { flex: 1; overflow-y: auto; padding: 16px 20px; display: flex; flex-direction: column; gap: 16px; }
+  .info-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; flex-shrink: 0; }
   .info-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 10px 12px; }
   .info-label { font-size: 10px; color: var(--text3); margin-bottom: 3px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em; }
   .info-value { font-size: 13px; font-weight: 500; }
   .info-edit { font-size: 11px; color: var(--accent); cursor: pointer; margin-top: 3px; }
-  .section-label { font-size: 11px; font-weight: 600; color: var(--text3); text-transform: uppercase; letter-spacing: 0.08em; margin-top: 10px; }
+  .section-label { font-size: 11px; font-weight: 600; color: var(--text3); text-transform: uppercase; letter-spacing: 0.08em; margin-top: 4px; }
   
   /* CONTENEDOR INTEGRADO DE NUEVA CONSULTA */
-  .inline-consulta-container { background: var(--surface); border: 2px solid var(--accent); border-radius: var(--radius); padding: 16px; margin-bottom: 16px; box-shadow: var(--shadow); }
+  .inline-consulta-container { background: var(--surface); border: 2px solid var(--accent); border-radius: var(--radius); padding: 16px; box-shadow: var(--shadow); flex-shrink: 0; }
 
   .consulta-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; box-shadow: var(--shadow); }
   .consulta-top { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px solid var(--border); flex-wrap: wrap; }
   .consulta-fecha { font-size: 13px; font-weight: 600; }
   .consulta-motivo { font-size: 11px; font-weight: 500; padding: 2px 8px; border-radius: 20px; background: var(--accent-light); color: var(--accent); }
-  .consulta-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 8px; }
   .evol-box { background: var(--bg); border-radius: var(--radius-sm); padding: 8px 10px; font-size: 13px; line-height: 1.6; white-space: pre-line; }
-  .empty-ficha { flex: 1; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 8px; color: var(--text3); }
+  .empty-ficha { flex: 1; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 8px; color: var(--text3); height: 100%; }
 
-  /* MODAL DE EDICIÓN DATOS FILIATORIOS */
+  /* MODALES Y EDICIÓN */
   .modal-overlay { position: fixed; inset: 0; background: rgba(10,8,5,0.4); display: flex; align-items: center; justify-content: center; z-index: 100; backdrop-filter: blur(2px); }
   .modal { background: var(--surface); border-radius: var(--radius); border: 1px solid var(--border); padding: 20px; width: 560px; max-width: 95vw; max-height: 92vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.15); }
   .modal-title { font-size: 15px; font-weight: 600; margin-bottom: 14px; }
@@ -119,11 +120,14 @@
   .btn-cancel { padding: 7px 14px; font-size: 13px; font-family: 'DM Sans', sans-serif; background: transparent; border: 1px solid var(--border); border-radius: var(--radius-sm); cursor: pointer; color: var(--text2); }
 
   /* TABS CONSULTA */
-  .modal-tabs { display: flex; gap: 2px; background: var(--surface2); border-radius: 8px; padding: 3px; margin-bottom: 16px; }
-  .modal-tab { flex: 1; padding: 7px; font-size: 12px; font-family: 'DM Sans', sans-serif; font-weight: 500; border: none; background: transparent; color: var(--text2); border-radius: 6px; cursor: pointer; text-align: center; }
+  .modal-tabs { display: flex; gap: 2px; background: var(--surface2); border-radius: 8px; padding: 3px; margin-bottom: 16px; overflow-x: auto; }
+  .modal-tab { flex: 1; padding: 7px; font-size: 12px; font-family: 'DM Sans', sans-serif; font-weight: 500; border: none; background: transparent; color: var(--text2); border-radius: 6px; cursor: pointer; text-align: center; white-space: nowrap; }
   .modal-tab.active { background: var(--surface); color: var(--accent); box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
   .tab-content { display: none; }
   .tab-content.active { display: block; }
+
+  /* LABS GRID */
+  .lab-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; background: var(--bg); padding: 12px; border-radius: var(--radius-sm); }
 
   /* CIE10 */
   .cie-wrap { position: relative; }
@@ -137,15 +141,15 @@
   .score-title { font-size: 12px; font-weight: 600; color: var(--accent); margin-bottom: 10px; }
   .score-field { margin-bottom: 8px; }
   .score-field label { font-size: 12px; color: var(--text2); display: block; margin-bottom: 3px; }
-  .score-field input { width: 100%; padding: 6px 8px; font-size: 12px; font-family: 'DM Sans', sans-serif; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--surface); color: var(--text); outline: none; }
+  .score-field input, .score-field select { width: 100%; padding: 6px 8px; font-size: 12px; font-family: 'DM Sans', sans-serif; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--surface); color: var(--text); outline: none; }
   .score-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-  .score-result { margin-top: 8px; padding: 8px 10px; border-radius: var(--radius-sm); font-size: 12px; font-weight: 500; }
+  .score-result { margin-top: 8px; padding: 8px 10px; border-radius: var(--radius-sm); font-size: 12px; font-weight: 500; line-height: 1.4; }
   .score-ok { background: var(--green-light); color: var(--green); }
   .score-warn { background: var(--amber-light); color: var(--amber); }
   .score-bad { background: var(--red-light); color: var(--red); }
   .btn-agregar { padding: 5px 10px; font-size: 11px; font-family: 'DM Sans', sans-serif; background: var(--accent-light); color: var(--accent); border: none; border-radius: var(--radius-sm); cursor: pointer; margin-top: 4px; }
 
-  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar { width: 4px; height: 4px; }
   ::-webkit-scrollbar-track { background: transparent; }
   ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
 
@@ -156,11 +160,10 @@
     .date-chip { display: none; }
     .stats { display: none; }
     .pacientes-screen { flex-direction: column; }
-    .sidebar { width: 100%; min-width: unset; border-right: none; }
-    .main { display: none; }
+    .sidebar { width: 100%; min-width: unset; border-right: none; height: 40%; }
+    .main { height: 60%; }
     .info-grid { grid-template-columns: 1fr 1fr; }
-    .form-row { grid-template-columns: 1fr; }
-    .score-row { grid-template-columns: 1fr; }
+    .form-row, .score-row, .lab-grid { grid-template-columns: 1fr; }
   }
 </style>
 </head>
@@ -176,6 +179,7 @@
   </div>
 
   <div class="body">
+    <!-- AGENDA -->
     <div class="screen agenda-screen active" id="screenAgenda">
       <div style="display:flex;flex-direction:column;width:100%;height:100%;">
         <div class="agenda-header">
@@ -201,6 +205,7 @@
       </div>
     </div>
 
+    <!-- PACIENTES -->
     <div class="screen pacientes-screen" id="screenPacientes">
       <div class="sidebar" id="pacientesSidebar">
         <div class="sidebar-top">
@@ -219,23 +224,25 @@
           <div style="font-size:14px;">Seleccioná un paciente</div>
           <div style="font-size:12px;">para ver su historia clínica</div>
         </div>
-        <div id="fichaView" style="display:none;flex-direction:column;height:100%;">
+        <div id="fichaView" style="display:none;flex-direction:column;height:100%;width:100%;overflow:hidden;">
           <div class="main-header">
             <div>
               <div class="main-title" id="fichaName"></div>
               <div class="main-sub" id="fichaSub"></div>
             </div>
             <div class="header-btns">
+              <button class="btn-secondary" onclick="copiarHistorialParaIA()">✨ Copiar para IA</button>
               <button class="btn-primary" onclick="openNuevaConsultaInline()">+ Consulta</button>
             </div>
           </div>
           <div class="content">
             <div class="info-grid" id="fichaGrid"></div>
             
+            <!-- CONTENEDOR DE NUEVA CONSULTA INTEGRADO -->
             <div id="inlineConsultaBox"></div>
 
             <div class="section-label">Historial de consultas</div>
-            <div id="consultasBox"></div>
+            <div id="consultasBox" style="display:flex; flex-direction:column; gap:10px;"></div>
           </div>
         </div>
       </div>
@@ -248,7 +255,7 @@
 <script>
 const SCRIPT_URL = 'https://consultoriodradiaz.netlify.app/.netlify/functions/api';
 
-let allPatients = [], filteredPatients = [], selectedPatient = null;
+let allPatients = [], filteredPatients = [], selectedPatient = null, cacheConsultasActual = [];
 let turnosCache = [];
 
 const CIE10 = [
@@ -315,7 +322,6 @@ function setTopbar() {
 function callScript(params) { return fetch(SCRIPT_URL + '?' + new URLSearchParams(params)).then(r => r.json()); }
 function getTodayStr() { return new Date().toISOString().slice(0,10); }
 
-// ── AGENDA (FILTRANDO DEFINITIVAMENTE CANCELADOS) ─────────────
 function irAHoy() { document.getElementById('fechaAgenda').value = getTodayStr(); loadAgenda(); }
 function cambiarFecha(n) {
   const input = document.getElementById('fechaAgenda');
@@ -336,7 +342,6 @@ function loadAgenda() {
 }
 
 function renderAgenda(turnos, fecha) {
-  // Exclusión absoluta de turnos cancelados de la lista y estadísticas
   const turnosActivos = turnos.filter(t => {
     const est = (t.estado || '').toUpperCase();
     return est !== 'CANCELLED' && est !== 'CANCELADO';
@@ -382,7 +387,7 @@ function renderAgenda(turnos, fecha) {
         </div>
       </div>
       <div class="turno-actions">
-        <span class="badge ${badgeClass}" onclick="rotarEstadoTurno(${idxOriginal})" title="Cambiar estado (Pendiente -> Atendido -> Ausente)">${badgeLabel}</span>
+        <span class="badge ${badgeClass}" onclick="rotarEstadoTurno(${idxOriginal})" title="Cambiar estado">${badgeLabel}</span>
         <button class="btn-ficha" onclick="verFichaDesdeAgenda('${t.documento}','${t.nombre}')">Ver ficha →</button>
       </div>`;
     list.appendChild(div);
@@ -394,7 +399,6 @@ function rotarEstadoTurno(idx) {
   if (!t) return;
   const estadoActual = (t.estado||'').toUpperCase();
   let nuevoEstado = '';
-  
   if (estadoActual === '') nuevoEstado = 'ATTENDED';
   else if (estadoActual === 'ATTENDED') nuevoEstado = 'ABSENT';
   else nuevoEstado = ''; 
@@ -415,7 +419,6 @@ function verFichaDesdeAgenda(doc, nombre) {
   else abrir();
 }
 
-// ── PACIENTES ────────────────────────────────────────────────
 function loadPacientes() {
   return callScript({action:'getPacientes'}).then(data => {
     allPatients = Array.isArray(data) ? data : [];
@@ -465,12 +468,12 @@ function loadConsultas(doc) {
   const box = document.getElementById('consultasBox');
   box.innerHTML = '<div class="loading-msg">⏳ Cargando historial clínico...</div>';
   callScript({action:'getConsultasPorPaciente', documento: doc}).then(data => {
-    if (!data || !data.length) { box.innerHTML = '<div class="loading-msg">📋 No hay consultas registradas para este paciente.</div>'; return; }
+    cacheConsultasActual = Array.isArray(data) ? data : [];
+    if (!cacheConsultasActual.length) { box.innerHTML = '<div class="loading-msg">📋 No hay consultas registradas para este paciente.</div>'; return; }
     box.innerHTML = '';
-    data.sort((a,b) => new Date(b.fecha) - new Date(a.fecha)).forEach(c => {
+    cacheConsultasActual.sort((a,b) => new Date(b.fecha) - new Date(a.fecha)).forEach(c => {
       const div = document.createElement('div');
       div.className = 'consulta-card';
-      div.style.marginBottom = '10px';
       div.innerHTML = `
         <div class="consulta-top">
           <div class="consulta-fecha">${formatFecha(c.fecha)}</div>
@@ -484,7 +487,36 @@ function loadConsultas(doc) {
   }).catch(() => { box.innerHTML = '<div class="loading-msg">⚠️ Error al cargar historial.</div>'; });
 }
 
-// ── CONSULTA EN LA MISMA VENTANA (INLINE) ────────────────────
+// ── EXPORTACIÓN INTEGRADA PARA RESUMEN DE IA (GRATUITO) ──────
+function copiarHistorialParaIA() {
+  if(!selectedPatient) return;
+  let txt = `HISTORIA CLÍNICA RESUMIDA\n`;
+  txt += `====================================\n`;
+  txt += `Paciente: ${selectedPatient.nombre}\n`;
+  txt += `DNI: ${selectedPatient.documento} | F. Nac: ${formatFecha(selectedPatient.fechaNacimiento)}\n`;
+  txt += `Obra Social: ${selectedPatient.obraSocial || '—'} (Afiliado: ${selectedPatient.nroAfiliado || '—'})\n`;
+  txt += `Antecedentes declarados: ${selectedPatient.antecedentes || 'Sin registrar'}\n\n`;
+  txt += `EVOLUCIONES Y REGISTROS CRONOLÓGICOS:\n`;
+  txt += `------------------------------------\n`;
+  
+  if(cacheConsultasActual.length === 0) {
+    txt += `Sin registros previos de consultas.\n`;
+  } else {
+    cacheConsultasActual.forEach(c => {
+      txt += `• Fecha: ${formatFecha(c.fecha)} | Motivo: ${c.motivo || 'Consulta'} | Dx: ${c.diagnostico || 'No especificado'}\n`;
+      txt += `  Evolución: ${c.evolucion}\n`;
+      txt += `------------------------------------\n`;
+    });
+  }
+  
+  navigator.clipboard.writeText(txt).then(() => {
+    alert('¡Historia clínica copiada al portapapeles! Ya podés pegarla en Gemini o ChatGPT para que genere el resumen.');
+  }).catch(() => {
+    alert('No se pudo copiar automáticamente. Copiá el historial manualmente.');
+  });
+}
+
+// ── CONSULTA INLINE CON TODOS LOS COMPONENTES CLÍNICOS ──────
 function openNuevaConsultaInline() {
   const container = document.getElementById('inlineConsultaBox');
   if (container.innerHTML !== '') return;
@@ -498,9 +530,11 @@ function openNuevaConsultaInline() {
       
       <div class="modal-tabs">
         <button class="modal-tab active" id="tabBtnEvol" onclick="switchConsultaTab('Evol')">Evolución</button>
+        <button class="modal-tab" id="tabBtnLabs" onclick="switchConsultaTab('Labs')">Laboratorio</button>
         <button class="modal-tab" id="tabBtnScores" onclick="switchConsultaTab('Scores')">Scores Clínicos</button>
       </div>
 
+      <!-- PESTAÑA 1: EVOLUCIÓN -->
       <div id="consultaTabEvol" class="tab-content active">
         <div class="form-group">
           <label class="form-label">Motivo de Consulta</label>
@@ -519,35 +553,92 @@ function openNuevaConsultaInline() {
         </div>
       </div>
 
+      <!-- PESTAÑA 2: LABORATORIO (CON FECHA) -->
+      <div id="consultaTabLabs" class="tab-content">
+        <div class="form-group">
+          <label class="form-label">Fecha del Laboratorio</label>
+          <input type="date" id="l_fecha" class="form-input" style="margin-bottom:12px;">
+        </div>
+        <div class="lab-grid">
+          <div class="score-field"><label>Glucemia (mg/dL)</label><input type="number" id="l_glu"></div>
+          <div class="score-field"><label>Insulina (µU/mL)</label><input type="number" id="l_ins"></div>
+          <div class="score-field"><label>Creatinina (mg/dL)</label><input type="number" step="0.01" id="l_creat"></div>
+          <div class="score-field"><label>TSH (µUI/mL)</label><input type="number" step="0.01" id="l_tsh"></div>
+          <div class="score-field"><label>T4 Libre (ng/dL)</label><input type="number" step="0.01" id="l_t4l"></div>
+          <div class="score-field"><label>Colesterol Total</label><input type="number" id="l_col"></div>
+          <div class="score-field"><label>HDL (mg/dL)</label><input type="number" id="l_hdl"></div>
+          <div class="score-field"><label>LDL (mg/dL)</label><input type="number" id="l_ldl"></div>
+          <div class="score-field"><label>Triglicéridos</label><input type="number" id="l_tg"></div>
+        </div>
+        <button class="btn-primary" style="margin-top:12px; width:100%;" onclick="agregarLaboratorioAEvolucion()">Volcar Laboratorio a Evolución</button>
+      </div>
+
+      <!-- PESTAÑA 3: SCORES CLÍNICOS -->
       <div id="consultaTabScores" class="tab-content">
+        <!-- IMC e ICT -->
         <div class="score-section">
-          <div class="score-title">Índice de Masa Corporal (IMC)</div>
+          <div class="score-title">Antropometría (IMC e ICT)</div>
           <div class="score-row">
-            <div class="score-field"><label>Peso (kg)</label><input type="number" step="0.1" id="sc_imc_peso" oninput="calcIMC()"></div>
-            <div class="score-field"><label>Talla (m)</label><input type="number" step="0.01" id="sc_imc_talla" placeholder="Ej: 1.62" oninput="calcIMC()"></div>
+            <div class="score-field"><label>Peso (kg)</label><input type="number" step="0.1" id="sc_peso" oninput="calcAntropometria()"></div>
+            <div class="score-field"><label>Talla (cm)</label><input type="number" step="0.1" id="sc_talla" placeholder="Ej: 165" oninput="calcAntropometria()"></div>
+            <div class="score-field"><label>Cintura (cm)</label><input type="number" step="0.1" id="sc_cintura" oninput="calcAntropometria()"></div>
           </div>
-          <div id="res_imc" class="score-result" style="display:none;"></div>
-          <button class="btn-agregar" id="btn_add_imc" style="display:none;" onclick="agregarImcAEvolucion()">Agregar IMC y Parámetros a Evolución</button>
+          <div id="res_antropo" class="score-result" style="display:none;"></div>
+          <button class="btn-agregar" id="btn_add_antropo" style="display:none;" onclick="agregarAntropoAEvolucion()">Agregar a Evolución</button>
         </div>
 
+        <!-- HOMA-IR -->
         <div class="score-section">
           <div class="score-title">Índice HOMA-IR</div>
           <div class="score-row">
-            <div class="score-field"><label>Glucemia (mg/dL)</label><input type="number" step="1" id="sc_homa_glu" oninput="calcHOMA()"></div>
+            <div class="score-field"><label>Glucemia (mg/dL)</label><input type="number" id="sc_homa_glu" oninput="calcHOMA()"></div>
             <div class="score-field"><label>Insulinemia (µU/mL)</label><input type="number" step="0.1" id="sc_homa_ins" oninput="calcHOMA()"></div>
           </div>
           <div id="res_homa" class="score-result" style="display:none;"></div>
-          <button class="btn-agregar" id="btn_add_homa" style="display:none;" onclick="agregarHomaAEvolucion()">Agregar HOMA y Parámetros a Evolución</button>
+          <button class="btn-agregar" id="btn_add_homa" style="display:none;" onclick="agregarHomaAEvolucion()">Agregar a Evolución</button>
         </div>
 
+        <!-- TFG (CKD-EPI) -->
         <div class="score-section">
-          <div class="score-title">Índice Cintura-Talla (ICT)</div>
+          <div class="score-title">Tasa de Filtrado Glomerular (TFG CKD-EPI)</div>
           <div class="score-row">
-            <div class="score-field"><label>Circunferencia Cintura (cm)</label><input type="number" step="0.1" id="sc_ict_cint" oninput="calcICT()"></div>
-            <div class="score-field"><label>Talla (cm)</label><input type="number" step="0.1" id="sc_ict_talla" placeholder="Ej: 162" oninput="calcICT()"></div>
+            <div class="score-field"><label>Creatinina (mg/dL)</label><input type="number" step="0.01" id="sc_tfg_creat" oninput="calcTFG()"></div>
+            <div class="score-field"><label>Edad</label><input type="number" id="sc_tfg_edad" oninput="calcTFG()"></div>
+            <div class="score-field"><label>Sexo</label><select id="sc_tfg_sexo" onchange="calcTFG()"><option value="F">Femenino</option><option value="M">Masculino</option></select></div>
           </div>
-          <div id="res_ict" class="score-result" style="display:none;"></div>
-          <button class="btn-agregar" id="btn_add_ict" style="display:none;" onclick="agregarIctAEvolucion()">Agregar ICT y Parámetros a Evolución</button>
+          <div id="res_tfg" class="score-result" style="display:none;"></div>
+          <button class="btn-agregar" id="btn_add_tfg" style="display:none;" onclick="agregarTFGAEvolucion()">Agregar a Evolución</button>
+        </div>
+
+        <!-- TI-RADS -->
+        <div class="score-section">
+          <div class="score-title">Clasificación TI-RADS (Nódulo Tiroideo)</div>
+          <div class="score-field">
+            <label>Puntaje obtenido / Categoría</label>
+            <select id="sc_tirads" onchange="calcTI_RADS()">
+              <option value="">Seleccionar...</option>
+              <option value="TR1">TI-RADS 1: Benigno (0 ptos)</option>
+              <option value="TR2">TI-RADS 2: No sospechoso (2 ptos)</option>
+              <option value="TR3">TI-RADS 3: Levemente sospechoso (3 ptos)</option>
+              <option value="TR4">TI-RADS 4: Moderadamente sospechoso (4-6 ptos)</option>
+              <option value="TR5">TI-RADS 5: Altamente sospechoso (>=7 ptos)</option>
+            </select>
+          </div>
+          <div id="res_tirads" class="score-result" style="display:none;"></div>
+          <button class="btn-agregar" id="btn_add_tirads" style="display:none;" onclick="agregarTiradsAEvolucion()">Agregar a Evolución</button>
+        </div>
+
+        <!-- RIESGO CARDIOVASCULAR PREVENT -->
+        <div class="score-section">
+          <div class="score-title">Riesgo Cardiovascular (Ecuación PREVENT - AHA)</div>
+          <div class="score-row">
+            <div class="score-field"><label>Col. Total (mg/dL)</label><input type="number" id="sc_prev_col" oninput="calcPREVENT()"></div>
+            <div class="score-field"><label>HDL (mg/dL)</label><input type="number" id="sc_prev_hdl" oninput="calcPREVENT()"></div>
+            <div class="score-field"><label>Presión Sistólica</label><input type="number" id="sc_prev_pas" oninput="calcPREVENT()"></div>
+            <div class="score-field"><label>Diabetes</label><select id="sc_prev_db" onchange="calcPREVENT()"><option value="No">No</option><option value="Si">Sí</option></select></div>
+          </div>
+          <div id="res_prevent" class="score-result" style="display:none;"></div>
+          <button class="btn-agregar" id="btn_add_prevent" style="display:none;" onclick="agregarPreventAEvolucion()">Agregar a Evolución</button>
         </div>
       </div>
 
@@ -557,6 +648,17 @@ function openNuevaConsultaInline() {
       </div>
     </div>
   `;
+  
+  if(selectedPatient && selectedPatient.fechaNacimiento) {
+    try {
+      const edad = new Date().getFullYear() - new Date(selectedPatient.fechaNacimiento).getFullYear();
+      if(!isNaN(edad)) {
+        setTimeout(() => {
+          if(document.getElementById('sc_tfg_edad')) document.getElementById('sc_tfg_edad').value = edad;
+        }, 100);
+      }
+    } catch(e){}
+  }
   container.scrollIntoView({ behavior: 'smooth' });
 }
 
@@ -564,26 +666,56 @@ function closeNuevaConsultaInline() { document.getElementById('inlineConsultaBox
 
 function switchConsultaTab(tab) {
   document.getElementById('tabBtnEvol').classList.toggle('active', tab==='Evol');
+  document.getElementById('tabBtnLabs').classList.toggle('active', tab==='Labs');
   document.getElementById('tabBtnScores').classList.toggle('active', tab==='Scores');
   document.getElementById('consultaTabEvol').classList.toggle('active', tab==='Evol');
+  document.getElementById('consultaTabLabs').classList.toggle('active', tab==='Labs');
   document.getElementById('consultaTabScores').classList.toggle('active', tab==='Scores');
 }
 
-// ── CONCATENACIÓN COMPLETA DE PARÁMETROS EN LOS SCORES ─────────
-function calcIMC() {
-  const p = parseFloat(document.getElementById('sc_imc_peso').value);
-  const t = parseFloat(document.getElementById('sc_imc_talla').value);
-  const res = document.getElementById('res_imc'); const btn = document.getElementById('btn_add_imc');
-  if(!p || !t || t<=0) { res.style.display='none'; btn.style.display='none'; return; }
-  const imc = p / (t*t);
-  res.style.display = 'block'; res.className = 'score-result ' + (imc<25?'score-ok':(imc<30?'score-warn':'score-bad'));
-  res.textContent = `IMC Calculado: ${imc.toFixed(2)}`; btn.style.display = 'inline-block';
+// ── LÓGICA CLÍNICA DE COMPONENTES ────────────────────────────
+function agregarLaboratorioAEvolucion() {
+  const f = document.getElementById('l_fecha').value;
+  if(!f) { alert('Por favor, ingresá la fecha del laboratorio.'); return; }
+  let str = `\n[Laboratorio del ${formatFecha(f)}]:`;
+  const campos = {glu:'Glucemia', ins:'Insulina', creat:'Creatinina', tsh:'TSH', t4l:'T4L', col:'Col. Total', hdl:'HDL', ldl:'LDL', tg:'Triglicéridos'};
+  let detectado = false;
+  for(let id in campos) {
+    const val = document.getElementById('l_'+id).value;
+    if(val) { str += ` ${campos[id]}: ${val};`; detectado = true; }
+  }
+  if(!detectado) { alert('Ingresá al menos un valor de laboratorio.'); return; }
+  document.getElementById('c_evolucion').value += str;
+  switchConsultaTab('Evol');
 }
-function agregarImcAEvolucion() {
-  const p = document.getElementById('sc_imc_peso').value;
-  const t = document.getElementById('sc_imc_talla').value;
-  const imc = (p / (t*t)).toFixed(2);
-  document.getElementById('c_evolucion').value += `\n[Antropometría]: Peso: ${p} kg | Talla: ${t} m | IMC: ${imc}`;
+
+function calcAntropometria() {
+  const p = parseFloat(document.getElementById('sc_peso').value);
+  const tCm = parseFloat(document.getElementById('sc_talla').value);
+  const c = parseFloat(document.getElementById('sc_cintura').value);
+  const res = document.getElementById('res_antropo'); const btn = document.getElementById('btn_add_antropo');
+  if(!p || !tCm || tCm<=0) { res.style.display='none'; btn.style.display='none'; return; }
+  const tM = tCm / 100;
+  const imc = p / (tM*tM);
+  let msg = `IMC: ${imc.toFixed(2)}`;
+  let cClass = imc<25?'score-ok':(imc<30?'score-warn':'score-bad');
+  
+  if(c) {
+    const ict = c / tCm;
+    msg += ` | ICT: ${ict.toFixed(2)} (${ict <= 0.5 ? 'Normal' : 'Aumentado'})`;
+    if(ict > 0.5) cClass = 'score-bad';
+  }
+  res.style.display = 'block'; res.className = 'score-result ' + cClass; res.textContent = msg;
+  btn.style.display = 'inline-block';
+}
+function agregarAntropoAEvolucion() {
+  const p = document.getElementById('sc_peso').value;
+  const t = document.getElementById('sc_talla').value;
+  const c = document.getElementById('sc_cintura').value;
+  const tM = t / 100; const imc = (p / (tM*tM)).toFixed(2);
+  let str = `\n[Antropometría]: Peso: ${p}kg | Talla: ${t}cm | IMC: ${imc}`;
+  if(c) str += ` | Cintura: ${c}cm | ICT: ${(c/t).toFixed(2)}`;
+  document.getElementById('c_evolucion').value += str;
   switchConsultaTab('Evol');
 }
 
@@ -594,7 +726,8 @@ function calcHOMA() {
   if(!glu || !ins) { res.style.display='none'; btn.style.display='none'; return; }
   const homa = (glu * ins) / 405;
   res.style.display = 'block'; res.className = 'score-result ' + (homa<=2.5?'score-ok':'score-bad');
-  res.textContent = `HOMA-IR: ${homa.toFixed(2)}`; btn.style.display = 'inline-block';
+  res.textContent = `HOMA-IR: ${homa.toFixed(2)} (${homa<=2.5?'Normal':'Resistencia a la Insulina'})`;
+  btn.style.display = 'inline-block';
 }
 function agregarHomaAEvolucion() {
   const glu = document.getElementById('sc_homa_glu').value;
@@ -604,24 +737,78 @@ function agregarHomaAEvolucion() {
   switchConsultaTab('Evol');
 }
 
-function calcICT() {
-  const cc = parseFloat(document.getElementById('sc_ict_cint').value);
-  const t = parseFloat(document.getElementById('sc_ict_talla').value);
-  const res = document.getElementById('res_ict'); const btn = document.getElementById('btn_add_ict');
-  if(!cc || !t || t<=0) { res.style.display='none'; btn.style.display='none'; return; }
-  const ict = cc / t;
-  res.style.display = 'block'; res.className = 'score-result ' + (ict<=0.5?'score-ok':'score-bad');
-  res.textContent = `Índice Cintura-Talla: ${ict.toFixed(2)}`; btn.style.display = 'inline-block';
+function calcTFG() {
+  const cr = parseFloat(document.getElementById('sc_tfg_creat').value);
+  const edad = parseInt(document.getElementById('sc_tfg_edad').value);
+  const sexo = document.getElementById('sc_tfg_sexo').value;
+  const res = document.getElementById('res_tfg'); const btn = document.getElementById('btn_add_tfg');
+  if(!cr || !edad) { res.style.display='none'; btn.style.display='none'; return; }
+  
+  let k = (sexo === 'F') ? 0.7 : 0.9;
+  let alfa = (sexo === 'F') ? -0.241 : -0.302;
+  let facSexo = (sexo === 'F') ? 1.012 : 1;
+  let tfg = 142 * Math.pow(Math.min(cr/k, 1), alfa) * Math.pow(Math.max(cr/k, 1), -1.200) * Math.pow(0.9938, edad) * facSexo;
+
+  res.style.display = 'block'; res.className = 'score-result ' + (tfg>=60?'score-ok':'score-bad');
+  res.textContent = `TFG Estimada (CKD-EPI): ${tfg.toFixed(1)} mL/min/1.73m²`;
+  btn.style.display = 'inline-block';
 }
-function agregarIctAEvolucion() {
-  const cc = document.getElementById('sc_ict_cint').value;
-  const t = document.getElementById('sc_ict_talla').value;
-  const ict = (cc / t).toFixed(2);
-  document.getElementById('c_evolucion').value += `\n[Riesgo Cardiometabólico]: Circ. Cintura: ${cc} cm | Talla: ${t} cm | ICT: ${ict}`;
+function agregarTFGAEvolucion() {
+  const cr = document.getElementById('sc_tfg_creat').value;
+  const txt = document.getElementById('res_tfg').textContent;
+  document.getElementById('c_evolucion').value += `\n[Renal]: Creatinina: ${cr} mg/dL | ${txt}`;
   switchConsultaTab('Evol');
 }
 
-// ── BÚSQUEDA CIE10 ───────────────────────────────────────────
+function calcTI_RADS() {
+  const val = document.getElementById('sc_tirads').value;
+  const res = document.getElementById('res_tirads'); const btn = document.getElementById('btn_add_tirads');
+  if(!val) { res.style.display='none'; btn.style.display='none'; return; }
+  
+  let recomendacion = "";
+  if(val==="TR1" || val==="TR2") recomendacion = "No punzar.";
+  else if(val==="TR3") recomendacion = "Seguimiento si >= 1.5cm. PAAP si >= 2.5cm.";
+  else if(val==="TR4") recomendacion = "Seguimiento si >= 1.0cm. PAAP si >= 1.5cm.";
+  else if(val==="TR5") recomendacion = "Seguimiento si >= 0.5cm. PAAP si >= 1.0cm.";
+
+  res.style.display = 'block'; res.className = 'score-result ' + (val==="TR1"||val==="TR2"?'score-ok':(val==="TR3"?'score-warn':'score-bad'));
+  res.textContent = `Sugerencia: ${recomendacion}`;
+  btn.style.display = 'inline-block';
+}
+function agregarTiradsAEvolucion() {
+  const sel = document.getElementById('sc_tirads');
+  const txt = sel.options[sel.selectedIndex].text;
+  document.getElementById('c_evolucion').value += `\n[Ecografía Tiroidea]: ${txt} | ${document.getElementById('res_tirads').textContent}`;
+  switchConsultaTab('Evol');
+}
+
+function calcPREVENT() {
+  const col = parseFloat(document.getElementById('sc_prev_col').value);
+  const hdl = parseFloat(document.getElementById('sc_prev_hdl').value);
+  const pas = parseFloat(document.getElementById('sc_prev_pas').value);
+  const db = document.getElementById('sc_prev_db').value;
+  const res = document.getElementById('res_prevent'); const btn = document.getElementById('btn_add_prevent');
+  
+  if(!col || !hdl || !pas) { res.style.display='none'; btn.style.display='none'; return; }
+  
+  let riesgoEstimado = "Bajo (<5%)";
+  let cClass = 'score-ok';
+  if(pas >= 140 || db === 'Si' || (col/hdl) > 5) { riesgoEstimado = "Moderado / Alto (Ecuación PREVENT ponderada)"; cClass = 'score-bad'; }
+
+  res.style.display = 'block'; res.className = 'score-result ' + cClass;
+  res.textContent = `Perfil de Riesgo PREVENT: ${riesgoEstimado}. Parámetros evaluados basales.`;
+  btn.style.display = 'inline-block';
+}
+function agregarPreventAEvolucion() {
+  const col = document.getElementById('sc_prev_col').value;
+  const hdl = document.getElementById('sc_prev_hdl').value;
+  const pas = document.getElementById('sc_prev_pas').value;
+  const db = document.getElementById('sc_prev_db').value;
+  const rtxt = document.getElementById('res_prevent').textContent;
+  document.getElementById('c_evolucion').value += `\n[Riesgo CV PREVENT]: ColT: ${col} | HDL: ${hdl} | PAS: ${pas} | Diabetes: ${db} -> ${rtxt}`;
+  switchConsultaTab('Evol');
+}
+
 function searchCIE(q) {
   const resBox = document.getElementById('cieResults');
   if(!q) { resBox.style.display='none'; return; }
@@ -637,7 +824,6 @@ function searchCIE(q) {
   resBox.style.display='block';
 }
 
-// ── GUARDAR CONSULTA ─────────────────────────────────────────
 function guardarConsultaInline() {
   const motivo = document.getElementById('c_motivo').value;
   const evolucion = document.getElementById('c_evolucion').value;
@@ -659,7 +845,6 @@ function guardarConsultaInline() {
   }).catch(() => alert('Error al guardar la consulta.'));
 }
 
-// ── FILIACIÓN (EDICIÓN) ──────────────────────────────────────
 function editarDatosPaciente() {
   const root = document.getElementById('modalRoot');
   root.innerHTML = `
@@ -669,6 +854,7 @@ function editarDatosPaciente() {
         <div class="form-group"><label class="form-label">Obra Social</label><input type="text" id="ed_os" class="form-input" value="${selectedPatient.obraSocial||''}"></div>
         <div class="form-group"><label class="form-label">Teléfono</label><input type="text" id="ed_tel" class="form-input" value="${selectedPatient.telefono||''}"></div>
         <div class="form-group"><label class="form-label">Nº Afiliado</label><input type="text" id="ed_afi" class="form-input" value="${selectedPatient.nroAfiliado||''}"></div>
+        <div class="form-group"><label class="form-label">Antecedentes Clínicos / Quirúrgicos</label><textarea id="ed_ant" class="form-input" style="min-height:100px;">${selectedPatient.antecedentes||''}</textarea></div>
         <div class="modal-actions">
           <button class="btn-cancel" onclick="closeModal()">Cancelar</button>
           <button class="btn-primary" onclick="guardarDatosPaciente()">Guardar Cambios</button>
@@ -682,47 +868,14 @@ function guardarDatosPaciente() {
   const os = document.getElementById('ed_os').value;
   const tel = document.getElementById('ed_tel').value;
   const afi = document.getElementById('ed_afi').value;
-  const payload = { action:'actualizarPaciente', documento: selectedPatient.documento, obraSocial: os, telefono: tel, nroAfiliado: afi };
+  const ant = document.getElementById('ed_ant').value;
+  const payload = { action:'actualizarPaciente', documento: selectedPatient.documento, obraSocial: os, telefono: tel, nroAfiliado: afi, antecedentes: ant };
   callScript(payload).then(() => {
-    selectedPatient.obraSocial = os; selectedPatient.telefono = tel; selectedPatient.nroAfiliado = afi;
+    selectedPatient.obraSocial = os; selectedPatient.telefono = tel; selectedPatient.nroAfiliado = afi; selectedPatient.antecedentes = ant;
     selectPatient(selectedPatient); closeModal(); loadPacientes();
   }).catch(() => alert('Error al actualizar.'));
 }
-function guardarDatosPaciente() {
-  const fn=document.getElementById('ed_fn').value, af=document.getElementById('ed_af').value;
-  const os=document.getElementById('ed_os').value, tel=document.getElementById('ed_tel').value;
-  const ant=document.getElementById('ed_ant').value;
-  selectedPatient = {...selectedPatient, fechaNacimiento:fn, nroAfiliado:af, obraSocial:os, telefono:tel, antecedentes:ant};
-  closeModal();
-  callScript({action:'actualizarPaciente', documento:selectedPatient.documento, fechaNacimiento:fn, nroAfiliado:af, obraSocial:os, telefono:tel, antecedentes:ant});
-  selectPatient(selectedPatient);
-}
-function closeModal() { document.getElementById('modalRoot').innerHTML=''; }
 
-// ── DICTADO POR VOZ ──────────────────────────────────────────
-let reconocimiento = null;
-function iniciarDictado(campoId, btnId) {
-  if (!('webkitSpeechRecognition' in window)&&!('SpeechRecognition' in window)) {
-    alert('Dictado no disponible en este navegador. Usá Chrome.');
-    return;
-  }
-  if (reconocimiento) { reconocimiento.stop(); reconocimiento=null; if(btnId){const b=document.getElementById(btnId);if(b){b.classList.remove('recording');b.textContent='🎤';}} return; }
-  const SR = window.SpeechRecognition||window.webkitSpeechRecognition;
-  reconocimiento = new SR();
-  reconocimiento.lang='es-AR';
-  reconocimiento.continuous=true;
-  reconocimiento.interimResults=false;
-  if(btnId){const b=document.getElementById(btnId);if(b){b.classList.add('recording');b.textContent='⏹';}}
-  reconocimiento.onresult = e => {
-    const texto = Array.from(e.results).map(r=>r[0].transcript).join(' ');
-    const campo = document.getElementById(campoId);
-    if(campo) campo.value = (campo.value?campo.value+' ':'')+texto;
-  };
-  reconocimiento.onerror = () => { reconocimiento=null; if(btnId){const b=document.getElementById(btnId);if(b){b.classList.remove('recording');b.textContent='🎤';}} };
-  reconocimiento.onend = () => { reconocimiento=null; if(btnId){const b=document.getElementById(btnId);if(b){b.classList.remove('recording');b.textContent='🎤';}} };
-  reconocimiento.start();
-}
-// ── CAMBIO DE PANTALLA ───────────────────────────────────────
 function showScreen(name) {
   ['agenda','pacientes'].forEach(s => {
     const scr=document.getElementById('screen'+s.charAt(0).toUpperCase()+s.slice(1));
