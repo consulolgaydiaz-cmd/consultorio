@@ -231,7 +231,8 @@
               <div class="main-sub" id="fichaSub"></div>
             </div>
             <div class="header-btns">
-              <button class="btn-secondary" onclick="copiarHistorialParaIA()">✨ Copiar para IA</button>
+              <button class="btn-secondary" onclick="copiarResumenFormal()" title="Copia un documento formal listo para imprimir o enviar">📄 Copiar Resumen</button>
+<button class="btn-secondary" onclick="copiarParaIA()" title="Copia los datos junto con el prompt para IA">✨ Analizar con IA</button>
               <button class="btn-primary" onclick="openNuevaConsultaInline()">+ Consulta</button>
             </div>
           </div>
@@ -487,33 +488,77 @@ function loadConsultas(doc) {
   }).catch(() => { box.innerHTML = '<div class="loading-msg">⚠️ Error al cargar historial.</div>'; });
 }
 
-// ── EXPORTACIÓN INTEGRADA PARA RESUMEN DE IA (GRATUITO) ──────
-function copiarHistorialParaIA() {
+// ── EXPORTACIÓN DE RESUMEN FORMAL (PARA IMPRIMIR/ENVIAR/AUDITORÍA) ──────
+function copiarResumenFormal() {
   if(!selectedPatient) return;
-  let txt = `HISTORIA CLÍNICA RESUMIDA\n`;
-  txt += `====================================\n`;
-  txt += `Paciente: ${selectedPatient.nombre}\n`;
-  txt += `DNI: ${selectedPatient.documento} | F. Nac: ${formatFecha(selectedPatient.fechaNacimiento)}\n`;
+  const hoy = new Date().toLocaleDateString('es-AR');
+  
+  let txt = `RESUMEN DE HISTORIA CLÍNICA\n`;
+  txt += `Fecha de emisión: ${hoy}\n\n`;
+  
+  txt += `DATOS DEL PACIENTE\n`;
+  txt += `Nombre y Apellido: ${selectedPatient.nombre}\n`;
+  txt += `DNI: ${selectedPatient.documento}\n`;
+  txt += `Fecha de Nacimiento: ${formatFecha(selectedPatient.fechaNacimiento)}\n`;
   txt += `Obra Social: ${selectedPatient.obraSocial || '—'} (Afiliado: ${selectedPatient.nroAfiliado || '—'})\n`;
-  txt += `Antecedentes declarados: ${selectedPatient.antecedentes || 'Sin registrar'}\n\n`;
-  txt += `EVOLUCIONES Y REGISTROS CRONOLÓGICOS:\n`;
+  txt += `Antecedentes Clínicos: ${selectedPatient.antecedentes || 'Sin registro'}\n\n`;
+  
+  txt += `EVOLUCIÓN CLÍNICA\n`;
   txt += `------------------------------------\n`;
   
   if(cacheConsultasActual.length === 0) {
     txt += `Sin registros previos de consultas.\n`;
   } else {
-    cacheConsultasActual.forEach(c => {
-      txt += `• Fecha: ${formatFecha(c.fecha)} | Motivo: ${c.motivo || 'Consulta'} | Dx: ${c.diagnostico || 'No especificado'}\n`;
-      txt += `  Evolución: ${c.evolucion}\n`;
+    // Para un documento formal, ordenamos de la más antigua a la más nueva
+    const consultasOrdenadas = [...cacheConsultasActual].sort((a,b) => new Date(a.fecha) - new Date(b.fecha));
+    consultasOrdenadas.forEach(c => {
+      txt += `Fecha: ${formatFecha(c.fecha)}\n`;
+      txt += `Motivo: ${c.motivo || 'Consulta'} | Diagnóstico: ${c.diagnostico || 'No especificado'}\n`;
+      txt += `Evolución: ${c.evolucion}\n`;
       txt += `------------------------------------\n`;
     });
   }
   
+  txt += `\n\n\n`;
+  txt += `.......................................\n`;
+  txt += `Dra. Olga Yolanda Díaz\n`;
+  txt += `Endocrinología - MP 81622\n`;
+
   navigator.clipboard.writeText(txt).then(() => {
-    alert('¡Historia clínica copiada al portapapeles! Ya podés pegarla en Gemini o ChatGPT para que genere el resumen.');
-  }).catch(() => {
-    alert('No se pudo copiar automáticamente. Copiá el historial manualmente.');
-  });
+    alert('📄 Resumen formal copiado al portapapeles. Listo para pegar en Word, Google Docs o para enviar.');
+  }).catch(() => alert('No se pudo copiar automáticamente.'));
+}
+
+// ── EXPORTACIÓN PARA INTELIGENCIA ARTIFICIAL (GEMINI/CHATGPT) ──────
+function copiarParaIA() {
+  if(!selectedPatient) return;
+  
+  let prompt = `Actúa como un médico especialista en endocrinología.\n`;
+  prompt += `A continuación te proporciono el historial clínico de un paciente. Tu tarea es analizar los datos y generar un resumen clínico ejecutivo y estructurado que me permita tener un panorama claro del paciente antes de su consulta.\n\n`;
+  prompt += `Redacta el resumen con los siguientes apartados:\n`;
+  prompt += `- Perfil del Paciente (Edad aproximada, antecedentes, obra social)\n`;
+  prompt += `- Evolución y Diagnósticos\n`;
+  prompt += `- Hallazgos Relevantes (Laboratorio y Scores extraídos de las evoluciones)\n`;
+  prompt += `- Conducta / Plan a seguir pendiente\n\n`;
+  prompt += `Mantén un lenguaje estrictamente médico, objetivo y conciso en viñetas. Omite introducciones, ve directo al resumen.\n\n`;
+  prompt += `--- HISTORIAL DEL PACIENTE ---\n`;
+  
+  prompt += `Paciente: ${selectedPatient.nombre} (DNI: ${selectedPatient.documento})\n`;
+  prompt += `F. Nac: ${formatFecha(selectedPatient.fechaNacimiento)} | Obra Social: ${selectedPatient.obraSocial || '-'}\n`;
+  prompt += `Antecedentes: ${selectedPatient.antecedentes || '-'}\n\n`;
+  
+  if(cacheConsultasActual.length === 0) {
+    prompt += `Sin registros previos.\n`;
+  } else {
+    // Para la IA, le damos los datos más recientes primero
+    cacheConsultasActual.forEach(c => {
+      prompt += `[${formatFecha(c.fecha)}] Motivo: ${c.motivo} | Dx: ${c.diagnostico}\n${c.evolucion}\n---\n`;
+    });
+  }
+  
+  navigator.clipboard.writeText(prompt).then(() => {
+    alert('✨ Datos y prompt listos. Pegalos directamente en Gemini o ChatGPT para obtener tu análisis rápido.');
+  }).catch(() => alert('No se pudo copiar automáticamente.'));
 }
 
 // ── CONSULTA INLINE CON TODOS LOS COMPONENTES CLÍNICOS ──────
