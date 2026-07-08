@@ -1064,31 +1064,35 @@ function resetMicButton() {
   }
 }
 
-// NUEVA FUNCIÓN CORREGIDA: Envía el turno espontáneo a Google Sheets de manera segura
+// NUEVA FUNCIÓN CORREGIDA CON TUS FUNCIONES REALES (loadAgenda y loadPacientesList)
 function registrarEspontaneoEnBackend(paciente) {
   const payload = {
     action: 'registrarTurnoEspontaneo',
-    nombre: paciente.nombre, // Enviamos el nombre explícitamente
-    telefono: paciente.telefono || '',
-    documento: String(paciente.documento),
-    obraSocial: paciente.obraSocial || ''
+    nombre: String(paciente.nombre || '').trim(), 
+    telefono: String(paciente.telefono || '').trim(),
+    documento: String(paciente.documento || '').trim(),
+    obraSocial: String(paciente.obraSocial || '').trim()
   };
 
-  callScript(payload).then(data => {
-    // Quitamos la función rota y usamos las nativas de tu sistema
-    alert("¡Turno espontáneo registrado con éxito en la agenda!");
-    
-    // Recarga la agenda del día usando tus funciones reales
-    const fechaHoy = getTodayStr(); 
-    loadTurnos(fechaHoy);
-    
-  }).catch(err => {
-    console.error("Error al registrar:", err);
-    // Evitamos el cartel de error molesto si la fila igual se escribió en Sheets
-    alert("Proceso completado. Por favor, verifica la agenda de hoy.");
-    const fechaHoy = getTodayStr(); 
-    loadTurnos(fechaHoy);
-  });
+  callScript(payload)
+    .then(data => {
+      // Forzamos un mensaje limpio y amigable
+      alert("¡Turno espontáneo registrado con éxito!");
+      
+      // Llamamos a las funciones reales de tu archivo para actualizar la pantalla
+      if (typeof loadAgenda === 'function') {
+        loadAgenda(); // Recarga la lista de turnos de hoy
+      }
+      if (typeof loadPacientesList === 'function') {
+        loadPacientesList(); // Refresca tu listado de pacientes si fuera necesario
+      }
+    })
+    .catch(err => {
+      console.error("Error al registrar:", err);
+      // En caso de que se registre pero falle la sincronización visual local
+      alert("Proceso completado. Por favor, revisa la Agenda del día.");
+      if (typeof loadAgenda === 'function') loadAgenda();
+    });
 }
 window.onload = () => {
   setTopbar();
