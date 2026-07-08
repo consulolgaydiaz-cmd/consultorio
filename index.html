@@ -174,7 +174,7 @@
     <div class="nav">
       <button class="nav-btn active" id="navAgenda" onclick="showScreen('agenda')">Agenda</button>
       <button class="nav-btn" id="navPacientes" onclick="showScreen('pacientes')">Pacientes</button>
-    </div>
+          </div>
     <div class="date-chip" id="topHora"></div>
   </div>
 
@@ -238,6 +238,15 @@
           </div>
           <div class="content">
             <div class="info-grid" id="fichaGrid"></div>
+            
+            <div id="bloqueAntecedentes" style="background: var(--amber-light); border: 1px solid var(--border); padding: 12px; border-radius: var(--radius); margin-top: 10px;">
+              <h3 style="margin: 0 0 5px 0; color: var(--amber); font-size: 14px; font-weight: 600;">⚠️ Antecedentes Médicos y Quirúrgicos</h3>
+              <p id="txtAntecedentesPaciente" style="margin: 0; color: var(--text); font-size: 13px; line-height: 1.4; white-space: pre-wrap;">Sin antecedentes registrados.</p>
+            </div>
+            
+            <button id="btnTurnoEspontaneo" style="background: var(--green); color: white; padding: 10px; font-weight: bold; border: none; border-radius: var(--radius); cursor: pointer; display: none; width: 100%; margin-top: 5px;">
+              ⚡ Registrar como Turno Espontáneo Hoy
+            </button>
             
             <!-- CONTENEDOR DE NUEVA CONSULTA INTEGRADO -->
             <div id="inlineConsultaBox"></div>
@@ -461,7 +470,26 @@ function selectPatient(p) {
     <div class="info-card"><div class="info-label">Nº Afiliado</div><div class="info-value">${p.nroAfiliado||'—'}</div><div class="info-edit" onclick="editarDatosPaciente()">✏️ editar</div></div>
     <div class="info-card"><div class="info-label">Fecha Nacimiento</div><div class="info-value">${p.fechaNacimiento ? formatFecha(p.fechaNacimiento) : '—'}</div><div class="info-edit" onclick="editarDatosPaciente()">✏️ editar</div></div>
   `;
-  
+ // NUEVO: Cargar antecedentes en la interfaz
+  const txtAnt = document.getElementById('txtAntecedentesPaciente');
+  if (p.antecedentes && p.antecedentes.trim() !== '') {
+    txtAnt.innerText = p.antecedentes;
+    txtAnt.style.fontStyle = 'normal';
+    txtAnt.style.color = 'var(--text)';
+  } else {
+    txtAnt.innerText = 'No hay antecedentes registrados. Cárgalos desde "Editar".';
+    txtAnt.style.fontStyle = 'italic';
+    txtAnt.style.color = 'var(--text3)';
+  }
+
+  // NUEVO: Activar el botón de turno espontáneo
+  const btnEsp = document.getElementById('btnTurnoEspontaneo');
+  btnEsp.style.display = 'block';
+  btnEsp.onclick = () => {
+    if (confirm(`¿Registrar turno espontáneo para ${p.nombre} hoy?`)) {
+      registrarEspontaneoEnBackend(p);
+    }
+  }; 
   loadConsultas(p.documento);
 }
 
@@ -903,6 +931,16 @@ function guardarConsultaInline() {
 
 function editarDatosPaciente() {
   const root = document.getElementById('modalRoot');
+  
+  // Formatear fecha para el input tipo "date" (requiere YYYY-MM-DD)
+  let fechaFormateada = '';
+  if (selectedPatient.fechaNacimiento) {
+    const d = new Date(selectedPatient.fechaNacimiento);
+    if (!isNaN(d.getTime())) {
+      fechaFormateada = d.toISOString().split('T')[0];
+    }
+  }
+
   root.innerHTML = `
     <div class="modal-overlay">
       <div class="modal">
@@ -910,6 +948,7 @@ function editarDatosPaciente() {
         <div class="form-group"><label class="form-label">Obra Social</label><input type="text" id="ed_os" class="form-input" value="${selectedPatient.obraSocial||''}"></div>
         <div class="form-group"><label class="form-label">Teléfono</label><input type="text" id="ed_tel" class="form-input" value="${selectedPatient.telefono||''}"></div>
         <div class="form-group"><label class="form-label">Nº Afiliado</label><input type="text" id="ed_afi" class="form-input" value="${selectedPatient.nroAfiliado||''}"></div>
+        <div class="form-group"><label class="form-label">Fecha de Nacimiento</label><input type="date" id="ed_nac" class="form-input" value="${fechaFormateada}"></div>
         <div class="form-group"><label class="form-label">Antecedentes Clínicos / Quirúrgicos</label><textarea id="ed_ant" class="form-input" style="min-height:100px;">${selectedPatient.antecedentes||''}</textarea></div>
         <div class="modal-actions">
           <button class="btn-cancel" onclick="closeModal()">Cancelar</button>
@@ -919,16 +958,28 @@ function editarDatosPaciente() {
     </div>
   `;
 }
+
 function closeModal() { document.getElementById('modalRoot').innerHTML = ''; }
+
 function guardarDatosPaciente() {
   const os = document.getElementById('ed_os').value;
   const tel = document.getElementById('ed_tel').value;
   const afi = document.getElementById('ed_afi').value;
   const ant = document.getElementById('ed_ant').value;
-  const payload = { action:'actualizarPaciente', documento: selectedPatient.documento, obraSocial: os, telefono: tel, nroAfiliado: afi, antecedentes: ant };
+  const nac = document.getElementById('ed_nac').value; // Nueva variable
+  
+  // Asegúrate de enviar fechaNacimiento en el payload
+  const payload = { action:'actualizarPaciente', documento: selectedPatient.documento, fechaNacimiento: nac, obraSocial: os, telefono: tel, nroAfiliado: afi, antecedentes: ant };
+  
   callScript(payload).then(() => {
-    selectedPatient.obraSocial = os; selectedPatient.telefono = tel; selectedPatient.nroAfiliado = afi; selectedPatient.antecedentes = ant;
-    selectPatient(selectedPatient); closeModal(); loadPacientes();
+    selectedPatient.obraSocial = os; 
+    selectedPatient.telefono = tel; 
+    selectedPatient.nroAfiliado = afi; 
+    selectedPatient.antecedentes = ant;
+    selectedPatient.fechaNacimiento = nac; // Actualizamos el objeto local
+    selectPatient(selectedPatient); 
+    closeModal(); 
+    loadPacientes();
   }).catch(() => alert('Error al actualizar.'));
 }
 
@@ -1011,6 +1062,30 @@ function resetMicButton() {
     btn.style.color = 'var(--accent)';
     btn.style.borderColor = 'var(--accent)';
   }
+}
+
+  // NUEVA FUNCIÓN: Envía el turno espontáneo a Google Sheets
+function registrarEspontaneoEnBackend(paciente) {
+  const payload = {
+    action: 'registrarTurnoEspontaneo',
+    nombre: paciente.nombre,
+    telefono: paciente.telefono || '',
+    documento: paciente.documento,
+    obraSocial: paciente.obraSocial || ''
+  };
+
+  callScript(payload).then(data => {
+    if (data && data.ok) {
+      alert("¡Turno espontáneo registrado con éxito en la agenda de hoy!");
+      // Forzamos a recargar la agenda del día para que aparezca
+      irAHoy(); 
+    } else {
+      alert("Hubo un error al registrar el turno espontáneo.");
+    }
+  }).catch(err => {
+    console.error("Error al registrar:", err);
+    alert("Error de conexión al registrar el turno.");
+  });
 }
 window.onload = () => {
   setTopbar();
