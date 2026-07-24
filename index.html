@@ -59,7 +59,7 @@
   .btn-ficha { padding: 6px 12px; font-size: 12px; font-family: 'DM Sans', sans-serif; font-weight: 500; background: var(--accent-light); color: var(--accent); border: none; border-radius: var(--radius-sm); cursor: pointer; white-space: nowrap; }
   .loading-msg { text-align: center; padding: 40px; color: var(--text2); font-size: 14px; }
 
-  /* PACIENTES (ESTRUCTURA CORREGIDA) */
+  /* PACIENTES */
   .pacientes-screen { flex-direction: row; width: 100%; height: 100%; overflow: hidden; }
   .sidebar { width: 280px; min-width: 280px; background: var(--surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; height: 100%; overflow: hidden; }
   .sidebar-top { padding: 14px; border-bottom: 1px solid var(--border); flex-shrink: 0; }
@@ -174,7 +174,7 @@
     <div class="nav">
       <button class="nav-btn active" id="navAgenda" onclick="showScreen('agenda')">Agenda</button>
       <button class="nav-btn" id="navPacientes" onclick="showScreen('pacientes')">Pacientes</button>
-          </div>
+    </div>
     <div class="date-chip" id="topHora"></div>
   </div>
 
@@ -231,11 +231,10 @@
               <div class="main-sub" id="fichaSub"></div>
             </div>
             <div class="header-btns">
+              <button class="btn-secondary" onclick="volverAgenda()" title="Volver a la vista de la agenda">📅 Volver a Agenda</button>
               <button class="btn-secondary" onclick="copiarResumenFormal()" title="Copia un documento formal listo para imprimir o enviar">📄 Copiar Resumen</button>
-<button class="btn-secondary" onclick="copiarParaIA()" title="Copia los datos junto con el prompt para IA">✨ Analizar con IA</button>
+              <button class="btn-secondary" onclick="copiarParaIA()" title="Copia los datos junto con el prompt para IA">✨ Analizar con IA</button>
               <button class="btn-primary" onclick="openNuevaConsultaInline()">+ Consulta</button>
-              <button onclick="volverAgenda()" class="btn-volver">⬅ Volver a la Agenda</button>
-  <div>
             </div>
           </div>
           <div class="content">
@@ -313,6 +312,7 @@ const CIE10 = [
 ];
 
 function initials(n) { return n.split(' ').filter(Boolean).map(w=>w[0]).join('').slice(0,2).toUpperCase(); }
+
 function formatFecha(f) {
   if (!f) return '—';
   if (/^\d{2}\/\d{2}\/\d{4}$/.test(String(f))) return f;
@@ -322,8 +322,8 @@ function formatFecha(f) {
     return `${String(d.getUTCDate()).padStart(2,'0')}/${String(d.getUTCMonth()+1).padStart(2,'0')}/${d.getUTCFullYear()}`;
   } catch(e) { return String(f); }
 }
-  
-  function calcularEdad(fechaNacimiento) {
+
+function calcularEdad(fechaNacimiento) {
   if (!fechaNacimiento) return '';
   const hoy = new Date();
   const nac = new Date(fechaNacimiento);
@@ -340,14 +340,17 @@ function setTopbar() {
   const hoy = new Date();
   const dias = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
   const meses = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
-  document.getElementById('topDate').textContent = `${dias[hoy.getDay()]} ${hoy.getDate()} de ${meses[hoy.getMonth()]}`;
+  document.getElementById('topDate').textContent = ` - ${dias[hoy.getDay()]} ${hoy.getDate()} de ${meses[hoy.getMonth()]}`;
   function tick() { document.getElementById('topHora').textContent = new Date().toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'}); }
   tick(); setInterval(tick, 10000);
 }
+
 function callScript(params) { return fetch(SCRIPT_URL + '?' + new URLSearchParams(params)).then(r => r.json()); }
+
 function getTodayStr() { return new Date().toISOString().slice(0,10); }
 
 function irAHoy() { document.getElementById('fechaAgenda').value = getTodayStr(); loadAgenda(); }
+
 function cambiarFecha(n) {
   const input = document.getElementById('fechaAgenda');
   const f = new Date(input.value + 'T12:00:00');
@@ -355,8 +358,10 @@ function cambiarFecha(n) {
   input.value = f.toISOString().slice(0,10);
   loadAgenda();
 }
+
 function loadAgenda() {
   const fecha = document.getElementById('fechaAgenda').value || getTodayStr();
+  document.getElementById('agendaSub').textContent = `Turnos para la fecha seleccionada`;
   document.getElementById('agendaList').innerHTML = '<div class="loading-msg">⏳ Cargando...</div>';
   callScript({action:'getTurnosPorFecha', fecha}).then(data => {
     turnosCache = Array.isArray(data) ? data : [];
@@ -453,12 +458,12 @@ function loadPacientes() {
     document.getElementById('patientList').innerHTML = '<div style="padding:16px;font-size:13px;color:var(--text3);">Error al cargar.</div>';
   });
 }
+
 function renderSidebar() {
   const list = document.getElementById('patientList');
   if (!filteredPatients.length) { list.innerHTML = '<div style="padding:16px;font-size:13px;color:var(--text3);">Sin resultados.</div>'; return; }
   list.innerHTML = '';
   filteredPatients.forEach(p => {
-    // Calculamos la edad y armamos el texto
     const edadTexto = calcularEdad(p.fechaNacimiento);
     const infoDni = edadTexto ? `DNI ${p.documento} - ${edadTexto}` : `DNI ${p.documento}`;
     
@@ -469,6 +474,7 @@ function renderSidebar() {
     list.appendChild(div);
   });
 }
+
 function filterPatients() {
   const q = document.getElementById('searchInput').value.toLowerCase();
   filteredPatients = allPatients.filter(p => p.nombre.toLowerCase().includes(q) || String(p.documento).includes(q));
@@ -482,11 +488,9 @@ function selectPatient(p) {
   document.getElementById('fichaView').style.display = 'flex';
   document.getElementById('fichaName').textContent = p.nombre;
   
-  // -- MODIFICACIÓN: Mostrar DNI + Edad + Obra Social --
   const edadTexto = calcularEdad(p.fechaNacimiento);
   const subTitulo = edadTexto ? `DNI ${p.documento} (${edadTexto})` : `DNI ${p.documento}`;
   document.getElementById('fichaSub').textContent = `${subTitulo}${p.obraSocial ? ' · ' + p.obraSocial : ''}`;
-  // ----------------------------------------------------
   
   document.getElementById('fichaGrid').innerHTML = `
     <div class="info-card"><div class="info-label">Obra Social</div><div class="info-value">${p.obraSocial||'—'}</div><div class="info-edit" onclick="editarDatosPaciente()">✏️ editar</div></div>
@@ -494,7 +498,7 @@ function selectPatient(p) {
     <div class="info-card"><div class="info-label">Nº Afiliado</div><div class="info-value">${p.nroAfiliado||'—'}</div><div class="info-edit" onclick="editarDatosPaciente()">✏️ editar</div></div>
     <div class="info-card"><div class="info-label">Fecha Nacimiento</div><div class="info-value">${p.fechaNacimiento ? formatFecha(p.fechaNacimiento) : '—'}</div><div class="info-edit" onclick="editarDatosPaciente()">✏️ editar</div></div>
   `;
- // NUEVO: Cargar antecedentes en la interfaz
+
   const txtAnt = document.getElementById('txtAntecedentesPaciente');
   if (p.antecedentes && p.antecedentes.trim() !== '') {
     txtAnt.innerText = p.antecedentes;
@@ -506,7 +510,6 @@ function selectPatient(p) {
     txtAnt.style.color = 'var(--text3)';
   }
 
-  // NUEVO: Activar el botón de turno espontáneo
   const btnEsp = document.getElementById('btnTurnoEspontaneo');
   btnEsp.style.display = 'block';
   btnEsp.onclick = () => {
@@ -540,28 +543,24 @@ function loadConsultas(doc) {
   }).catch(() => { box.innerHTML = '<div class="loading-msg">⚠️ Error al cargar historial.</div>'; });
 }
 
-// ── EXPORTACIÓN DE RESUMEN FORMAL (PARA IMPRIMIR/ENVIAR/AUDITORÍA) ──────
 function copiarResumenFormal() {
   if(!selectedPatient) return;
   const hoy = new Date().toLocaleDateString('es-AR');
   
   let txt = `RESUMEN DE HISTORIA CLÍNICA\n`;
   txt += `Fecha de emisión: ${hoy}\n\n`;
-  
   txt += `DATOS DEL PACIENTE\n`;
   txt += `Nombre y Apellido: ${selectedPatient.nombre}\n`;
   txt += `DNI: ${selectedPatient.documento}\n`;
   txt += `Fecha de Nacimiento: ${formatFecha(selectedPatient.fechaNacimiento)}\n`;
   txt += `Obra Social: ${selectedPatient.obraSocial || '—'} (Afiliado: ${selectedPatient.nroAfiliado || '—'})\n`;
   txt += `Antecedentes Clínicos: ${selectedPatient.antecedentes || 'Sin registro'}\n\n`;
-  
   txt += `EVOLUCIÓN CLÍNICA\n`;
   txt += `------------------------------------\n`;
   
   if(cacheConsultasActual.length === 0) {
     txt += `Sin registros previos de consultas.\n`;
   } else {
-    // Para un documento formal, ordenamos de la más antigua a la más nueva
     const consultasOrdenadas = [...cacheConsultasActual].sort((a,b) => new Date(a.fecha) - new Date(b.fecha));
     consultasOrdenadas.forEach(c => {
       txt += `Fecha: ${formatFecha(c.fecha)}\n`;
@@ -571,17 +570,14 @@ function copiarResumenFormal() {
     });
   }
   
-  txt += `\n\n\n`;
-  txt += `.......................................\n`;
-  txt += `Dra. Olga Yolanda Díaz\n`;
-  txt += `Endocrinología - MP 81622\n`;
+  txt += `\n\n\n.......................................\n`;
+  txt += `Dra. Olga Yolanda Díaz\nEndocrinología - MP 81622\n`;
 
   navigator.clipboard.writeText(txt).then(() => {
     alert('📄 Resumen formal copiado al portapapeles. Listo para pegar en Word, Google Docs o para enviar.');
   }).catch(() => alert('No se pudo copiar automáticamente.'));
 }
 
-// ── EXPORTACIÓN PARA INTELIGENCIA ARTIFICIAL (GEMINI/CHATGPT) ──────
 function copiarParaIA() {
   if(!selectedPatient) return;
   
@@ -592,9 +588,8 @@ function copiarParaIA() {
   prompt += `- Evolución y Diagnósticos\n`;
   prompt += `- Hallazgos Relevantes (Laboratorio y Scores extraídos de las evoluciones)\n`;
   prompt += `- Conducta / Plan a seguir pendiente\n\n`;
-  prompt += `Mantén un lenguaje estrictamente médico, objetivo y conciso en viñetas. Omite introducciones, ve directo al resumen.\n\n`;
+  prompt += `Mantén un lenguaje strictly médico, objetivo y conciso en viñetas. Omite introducciones, ve directo al resumen.\n\n`;
   prompt += `--- HISTORIAL DEL PACIENTE ---\n`;
-  
   prompt += `Paciente: ${selectedPatient.nombre} (DNI: ${selectedPatient.documento})\n`;
   prompt += `F. Nac: ${formatFecha(selectedPatient.fechaNacimiento)} | Obra Social: ${selectedPatient.obraSocial || '-'}\n`;
   prompt += `Antecedentes: ${selectedPatient.antecedentes || '-'}\n\n`;
@@ -602,7 +597,6 @@ function copiarParaIA() {
   if(cacheConsultasActual.length === 0) {
     prompt += `Sin registros previos.\n`;
   } else {
-    // Para la IA, le damos los datos más recientes primero
     cacheConsultasActual.forEach(c => {
       prompt += `[${formatFecha(c.fecha)}] Motivo: ${c.motivo} | Dx: ${c.diagnostico}\n${c.evolucion}\n---\n`;
     });
@@ -613,7 +607,6 @@ function copiarParaIA() {
   }).catch(() => alert('No se pudo copiar automáticamente.'));
 }
 
-// ── CONSULTA INLINE CON TODOS LOS COMPONENTES CLÍNICOS ──────
 function openNuevaConsultaInline() {
   const container = document.getElementById('inlineConsultaBox');
   if (container.innerHTML !== '') return;
@@ -637,7 +630,7 @@ function openNuevaConsultaInline() {
           <label class="form-label">Motivo de Consulta</label>
           <input type="text" id="c_motivo" class="form-input" placeholder="Ej. Control de evolución">
         </div>
-       <div class="form-group">
+        <div class="form-group">
           <label class="form-label" style="display:flex; justify-content:space-between; align-items:center;">
             Evolución Clínica
             <button type="button" id="btnMicEvolucion" onclick="toggleDictation()" style="background:var(--accent-light); border:1px solid var(--accent); border-radius:var(--radius-sm); padding:4px 10px; cursor:pointer; font-size:12px; font-family:'DM Sans',sans-serif; font-weight:500; color:var(--accent);" title="Dictar por voz">🎤 Activar Micrófono</button>
@@ -653,7 +646,7 @@ function openNuevaConsultaInline() {
         </div>
       </div>
 
-      <!-- PESTAÑA 2: LABORATORIO (CON FECHA) -->
+      <!-- PESTAÑA 2: LABORATORIO -->
       <div id="consultaTabLabs" class="tab-content">
         <div class="form-group">
           <label class="form-label">Fecha del Laboratorio</label>
@@ -683,7 +676,6 @@ function openNuevaConsultaInline() {
 
       <!-- PESTAÑA 3: SCORES CLÍNICOS -->
       <div id="consultaTabScores" class="tab-content">
-        <!-- IMC e ICT -->
         <div class="score-section">
           <div class="score-title">Antropometría (IMC e ICT)</div>
           <div class="score-row">
@@ -695,7 +687,6 @@ function openNuevaConsultaInline() {
           <button class="btn-agregar" id="btn_add_antropo" style="display:none;" onclick="agregarAntropoAEvolucion()">Agregar a Evolución</button>
         </div>
 
-        <!-- HOMA-IR -->
         <div class="score-section">
           <div class="score-title">Índice HOMA-IR</div>
           <div class="score-row">
@@ -706,7 +697,6 @@ function openNuevaConsultaInline() {
           <button class="btn-agregar" id="btn_add_homa" style="display:none;" onclick="agregarHomaAEvolucion()">Agregar a Evolución</button>
         </div>
 
-        <!-- TFG (CKD-EPI) -->
         <div class="score-section">
           <div class="score-title">Tasa de Filtrado Glomerular (TFG CKD-EPI)</div>
           <div class="score-row">
@@ -718,7 +708,6 @@ function openNuevaConsultaInline() {
           <button class="btn-agregar" id="btn_add_tfg" style="display:none;" onclick="agregarTFGAEvolucion()">Agregar a Evolución</button>
         </div>
 
-        <!-- TI-RADS -->
         <div class="score-section">
           <div class="score-title">Clasificación TI-RADS (Nódulo Tiroideo)</div>
           <div class="score-field">
@@ -736,7 +725,6 @@ function openNuevaConsultaInline() {
           <button class="btn-agregar" id="btn_add_tirads" style="display:none;" onclick="agregarTiradsAEvolucion()">Agregar a Evolución</button>
         </div>
 
-        <!-- RIESGO CARDIOVASCULAR PREVENT -->
         <div class="score-section">
           <div class="score-title">Riesgo Cardiovascular (Ecuación PREVENT - AHA)</div>
           <div class="score-row">
@@ -781,7 +769,6 @@ function switchConsultaTab(tab) {
   document.getElementById('consultaTabScores').classList.toggle('active', tab==='Scores');
 }
 
-// ── LÓGICA CLÍNICA DE COMPONENTES ────────────────────────────
 function agregarLaboratorioAEvolucion() {
   const f = document.getElementById('l_fecha').value;
   if(!f) { alert('Por favor, ingresá la fecha del laboratorio.'); return; }
@@ -816,6 +803,7 @@ function calcAntropometria() {
   res.style.display = 'block'; res.className = 'score-result ' + cClass; res.textContent = msg;
   btn.style.display = 'inline-block';
 }
+
 function agregarAntropoAEvolucion() {
   const p = document.getElementById('sc_peso').value;
   const t = document.getElementById('sc_talla').value;
@@ -837,6 +825,7 @@ function calcHOMA() {
   res.textContent = `HOMA-IR: ${homa.toFixed(2)} (${homa<=2.5?'Normal':'Resistencia a la Insulina'})`;
   btn.style.display = 'inline-block';
 }
+
 function agregarHomaAEvolucion() {
   const glu = document.getElementById('sc_homa_glu').value;
   const ins = document.getElementById('sc_homa_ins').value;
@@ -861,6 +850,7 @@ function calcTFG() {
   res.textContent = `TFG Estimada (CKD-EPI): ${tfg.toFixed(1)} mL/min/1.73m²`;
   btn.style.display = 'inline-block';
 }
+
 function agregarTFGAEvolucion() {
   const cr = document.getElementById('sc_tfg_creat').value;
   const txt = document.getElementById('res_tfg').textContent;
@@ -883,6 +873,7 @@ function calcTI_RADS() {
   res.textContent = `Sugerencia: ${recomendacion}`;
   btn.style.display = 'inline-block';
 }
+
 function agregarTiradsAEvolucion() {
   const sel = document.getElementById('sc_tirads');
   const txt = sel.options[sel.selectedIndex].text;
@@ -907,6 +898,7 @@ function calcPREVENT() {
   res.textContent = `Perfil de Riesgo PREVENT: ${riesgoEstimado}. Parámetros evaluados basales.`;
   btn.style.display = 'inline-block';
 }
+
 function agregarPreventAEvolucion() {
   const col = document.getElementById('sc_prev_col').value;
   const hdl = document.getElementById('sc_prev_hdl').value;
@@ -933,50 +925,46 @@ function searchCIE(q) {
 }
 
 function guardarConsultaInline() {
-  const motivo = document.getElementById('c_motivo').value;[cite: 3]
-  const evolucion = document.getElementById('c_evolucion').value;[cite: 3]
-  const diagnostico = document.getElementById('c_cie').value;[cite: 3]
-  if (!evolucion) { alert('La evolución clínica no puede estar vacía.'); return; }[cite: 3]
+  const motivo = document.getElementById('c_motivo').value;
+  const evolucion = document.getElementById('c_evolucion').value;
+  const diagnostico = document.getElementById('c_cie').value;
+  if (!evolucion) { alert('La evolución clínica no puede estar vacía.'); return; }
   
   const payload = {
-    action: 'guardarConsulta',[cite: 3]
-    documento: selectedPatient.documento,[cite: 3]
-    fecha: getTodayStr(),[cite: 3]
-    motivo: motivo || 'Consulta',[cite: 3]
-    evolucion: evolucion,[cite: 3]
-    diagnostico: diagnostico || ''[cite: 3]
+    action: 'guardarConsulta',
+    documento: selectedPatient.documento,
+    fecha: getTodayStr(),
+    motivo: motivo || 'Consulta',
+    evolucion: evolucion,
+    diagnostico: diagnostico || ''
   };
   
-  callScript(payload).then(() => {[cite: 3]
-    // -------------------------------------------------------------
-    // MODIFICACIÓN: Cambiar estado a 'ATTENDED' (Atendido) si tiene turno hoy
-    // -------------------------------------------------------------
-    if (turnosCache && turnosCache.length > 0 && selectedPatient) {[cite: 3]
-      const turnoPaciente = turnosCache.find(t => String(t.documento) === String(selectedPatient.documento));[cite: 3]
+  callScript(payload).then(() => {
+    if (turnosCache && turnosCache.length > 0 && selectedPatient) {
+      const turnoPaciente = turnosCache.find(t => String(t.documento) === String(selectedPatient.documento));
       
-      if (turnoPaciente && (turnoPaciente.estado || '').toUpperCase() !== 'ATTENDED') {[cite: 3]
+      if (turnoPaciente && (turnoPaciente.estado || '').toUpperCase() !== 'ATTENDED') {
         callScript({
-          action: 'actualizarEstadoTurno',[cite: 3]
-          idBooking: turnoPaciente.idBooking,[cite: 3]
-          estado: 'ATTENDED'[cite: 3]
+          action: 'actualizarEstadoTurno',
+          idBooking: turnoPaciente.idBooking,
+          estado: 'ATTENDED'
         }).then(() => {
-          turnoPaciente.estado = 'ATTENDED';[cite: 3]
+          turnoPaciente.estado = 'ATTENDED';
           if (typeof loadAgenda === 'function') {
-            loadAgenda(); // Refresca la agenda en segundo plano[cite: 3]
+            loadAgenda();
           }
         }).catch(err => console.error('Error al actualizar el estado del turno:', err));
       }
     }
-    // -------------------------------------------------------------
 
-    closeNuevaConsultaInline();[cite: 3]
-    loadConsultas(selectedPatient.documento);[cite: 3]
-  }).catch(() => alert('Error al guardar la consulta.'));[cite: 3]
+    closeNuevaConsultaInline();
+    loadConsultas(selectedPatient.documento);
+  }).catch(() => alert('Error al guardar la consulta.'));
 }
+
 function editarDatosPaciente() {
   const root = document.getElementById('modalRoot');
   
-  // Formatear fecha para el input tipo "date" (requiere YYYY-MM-DD)
   let fechaFormateada = '';
   if (selectedPatient.fechaNacimiento) {
     const d = new Date(selectedPatient.fechaNacimiento);
@@ -1010,9 +998,8 @@ function guardarDatosPaciente() {
   const tel = document.getElementById('ed_tel').value;
   const afi = document.getElementById('ed_afi').value;
   const ant = document.getElementById('ed_ant').value;
-  const nac = document.getElementById('ed_nac').value; // Nueva variable
+  const nac = document.getElementById('ed_nac').value;
   
-  // Asegúrate de enviar fechaNacimiento en el payload
   const payload = { action:'actualizarPaciente', documento: selectedPatient.documento, fechaNacimiento: nac, obraSocial: os, telefono: tel, nroAfiliado: afi, antecedentes: ant };
   
   callScript(payload).then(() => {
@@ -1020,7 +1007,7 @@ function guardarDatosPaciente() {
     selectedPatient.telefono = tel; 
     selectedPatient.nroAfiliado = afi; 
     selectedPatient.antecedentes = ant;
-    selectedPatient.fechaNacimiento = nac; // Actualizamos el objeto local
+    selectedPatient.fechaNacimiento = nac;
     selectPatient(selectedPatient); 
     closeModal(); 
     loadPacientes();
@@ -1036,7 +1023,7 @@ function showScreen(name) {
   });
   if (name==='pacientes' && !allPatients.length) loadPacientes();
 }
-// ── LÓGICA DE RECONOCIMIENTO DE VOZ (DICTADO) ────────────────
+
 let recognition;
 let isDictating = false;
 
@@ -1049,16 +1036,15 @@ function toggleDictation() {
     return;
   }
 
-  // Verifica si el navegador soporta la API
   if (!('webkitSpeechRecognition' in window)) {
     alert('Tu navegador no soporta el dictado por voz. Te sugerimos usar Google Chrome.');
     return;
   }
 
   recognition = new webkitSpeechRecognition();
-  recognition.lang = 'es-AR'; // Configurado para acento local
+  recognition.lang = 'es-AR';
   recognition.continuous = true;
-  recognition.interimResults = true; // Muestra los resultados mientras hablas
+  recognition.interimResults = true;
 
   recognition.onstart = function() {
     isDictating = true;
@@ -1070,7 +1056,6 @@ function toggleDictation() {
 
   recognition.onresult = function(event) {
     let finalTranscript = '';
-
     for (let i = event.resultIndex; i < event.results.length; ++i) {
       if (event.results[i].isFinal) {
         finalTranscript += event.results[i][0].transcript;
@@ -1078,7 +1063,6 @@ function toggleDictation() {
     }
     
     if (finalTranscript) {
-      // Agrega un espacio si el textarea ya tiene texto y no termina en espacio
       const currentText = textarea.value;
       const needsSpace = currentText.length > 0 && !currentText.endsWith(' ') && !currentText.endsWith('\n');
       textarea.value += (needsSpace ? ' ' : '') + finalTranscript;
@@ -1107,23 +1091,16 @@ function resetMicButton() {
     btn.style.borderColor = 'var(--accent)';
   }
 }
-  function volverAgenda() {
-  // 1. Ocultar la ficha médica y restaurar la vista vacía inicial[cite: 2]
-  document.getElementById('fichaView').style.display = 'none';[cite: 2]
-  document.getElementById('emptyFicha').style.display = 'flex';[cite: 2]
-  
-  // 2. Limpiar el contenedor de consulta si estaba abierto
-  document.getElementById('inlineConsultaBox').innerHTML = '';
 
-  // 3. Deseleccionar al paciente actual y actualizar la lista lateral[cite: 2]
-  selectedPatient = null;[cite: 2]
-  renderSidebar();[cite: 2]
-  
-  // 4. Cambiar activamente a la pantalla de la Agenda
-  showScreen('agenda');[cite: 3]
+function volverAgenda() {
+  document.getElementById('fichaView').style.display = 'none';
+  document.getElementById('emptyFicha').style.display = 'flex';
+  document.getElementById('inlineConsultaBox').innerHTML = '';
+  selectedPatient = null;
+  renderSidebar();
+  showScreen('agenda');
 }
 
-// NUEVA FUNCIÓN CORREGIDA CON TUS FUNCIONES REALES (loadAgenda y loadPacientesList)
 function registrarEspontaneoEnBackend(paciente) {
   const payload = {
     action: 'registrarTurnoEspontaneo',
@@ -1135,24 +1112,18 @@ function registrarEspontaneoEnBackend(paciente) {
 
   callScript(payload)
     .then(data => {
-      // Forzamos un mensaje limpio y amigable
       alert("¡Turno espontáneo registrado con éxito!");
-      
-      // Llamamos a las funciones reales de tu archivo para actualizar la pantalla
       if (typeof loadAgenda === 'function') {
-        loadAgenda(); // Recarga la lista de turnos de hoy
-      }
-      if (typeof loadPacientesList === 'function') {
-        loadPacientesList(); // Refresca tu listado de pacientes si fuera necesario
+        loadAgenda();
       }
     })
     .catch(err => {
       console.error("Error al registrar:", err);
-      // En caso de que se registre pero falle la sincronización visual local
       alert("Proceso completado. Por favor, revisa la Agenda del día.");
       if (typeof loadAgenda === 'function') loadAgenda();
     });
 }
+
 window.onload = () => {
   setTopbar();
   irAHoy();
