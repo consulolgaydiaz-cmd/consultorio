@@ -234,6 +234,8 @@
               <button class="btn-secondary" onclick="copiarResumenFormal()" title="Copia un documento formal listo para imprimir o enviar">📄 Copiar Resumen</button>
 <button class="btn-secondary" onclick="copiarParaIA()" title="Copia los datos junto con el prompt para IA">✨ Analizar con IA</button>
               <button class="btn-primary" onclick="openNuevaConsultaInline()">+ Consulta</button>
+              <button onclick="volverAgenda()" class="btn-volver">⬅ Volver a la Agenda</button>
+  <div>
             </div>
           </div>
           <div class="content">
@@ -319,6 +321,19 @@ function formatFecha(f) {
     if (isNaN(d.getTime())) return String(f);
     return `${String(d.getUTCDate()).padStart(2,'0')}/${String(d.getUTCMonth()+1).padStart(2,'0')}/${d.getUTCFullYear()}`;
   } catch(e) { return String(f); }
+}
+  
+  function calcularEdad(fechaNacimiento) {
+  if (!fechaNacimiento) return '';
+  const hoy = new Date();
+  const nac = new Date(fechaNacimiento);
+  if (isNaN(nac.getTime())) return '';
+  let edad = hoy.getFullYear() - nac.getFullYear();
+  const m = hoy.getMonth() - nac.getMonth();
+  if (m < 0 || (m === 0 && hoy.getDate() < nac.getDate())) {
+    edad--;
+  }
+  return edad + ' años';
 }
 
 function setTopbar() {
@@ -443,9 +458,13 @@ function renderSidebar() {
   if (!filteredPatients.length) { list.innerHTML = '<div style="padding:16px;font-size:13px;color:var(--text3);">Sin resultados.</div>'; return; }
   list.innerHTML = '';
   filteredPatients.forEach(p => {
+    // Calculamos la edad y armamos el texto
+    const edadTexto = calcularEdad(p.fechaNacimiento);
+    const infoDni = edadTexto ? `DNI ${p.documento} - ${edadTexto}` : `DNI ${p.documento}`;
+    
     const div = document.createElement('div');
     div.className = 'patient-item' + (selectedPatient && selectedPatient.documento === p.documento ? ' active' : '');
-    div.innerHTML = `<div class="avatar">${initials(p.nombre)}</div><div><div class="patient-name">${p.nombre}</div><div class="patient-doc">DNI ${p.documento}</div></div>`;
+    div.innerHTML = `<div class="avatar">${initials(p.nombre)}</div><div><div class="patient-name">${p.nombre}</div><div class="patient-doc">${infoDni}</div></div>`;
     div.onclick = () => selectPatient(p);
     list.appendChild(div);
   });
@@ -462,7 +481,12 @@ function selectPatient(p) {
   document.getElementById('inlineConsultaBox').innerHTML = ''; 
   document.getElementById('fichaView').style.display = 'flex';
   document.getElementById('fichaName').textContent = p.nombre;
-  document.getElementById('fichaSub').textContent = `DNI ${p.documento}${p.obraSocial ? ' · ' + p.obraSocial : ''}`;
+  
+  // -- MODIFICACIÓN: Mostrar DNI + Edad + Obra Social --
+  const edadTexto = calcularEdad(p.fechaNacimiento);
+  const subTitulo = edadTexto ? `DNI ${p.documento} (${edadTexto})` : `DNI ${p.documento}`;
+  document.getElementById('fichaSub').textContent = `${subTitulo}${p.obraSocial ? ' · ' + p.obraSocial : ''}`;
+  // ----------------------------------------------------
   
   document.getElementById('fichaGrid').innerHTML = `
     <div class="info-card"><div class="info-label">Obra Social</div><div class="info-value">${p.obraSocial||'—'}</div><div class="info-edit" onclick="editarDatosPaciente()">✏️ editar</div></div>
@@ -909,26 +933,46 @@ function searchCIE(q) {
 }
 
 function guardarConsultaInline() {
-  const motivo = document.getElementById('c_motivo').value;
-  const evolucion = document.getElementById('c_evolucion').value;
-  const diagnostico = document.getElementById('c_cie').value;
-  if (!evolucion) { alert('La evolución clínica no puede estar vacía.'); return; }
+  const motivo = document.getElementById('c_motivo').value;[cite: 3]
+  const evolucion = document.getElementById('c_evolucion').value;[cite: 3]
+  const diagnostico = document.getElementById('c_cie').value;[cite: 3]
+  if (!evolucion) { alert('La evolución clínica no puede estar vacía.'); return; }[cite: 3]
   
   const payload = {
-    action: 'guardarConsulta',
-    documento: selectedPatient.documento,
-    fecha: getTodayStr(),
-    motivo: motivo || 'Consulta',
-    evolucion: evolucion,
-    diagnostico: diagnostico || ''
+    action: 'guardarConsulta',[cite: 3]
+    documento: selectedPatient.documento,[cite: 3]
+    fecha: getTodayStr(),[cite: 3]
+    motivo: motivo || 'Consulta',[cite: 3]
+    evolucion: evolucion,[cite: 3]
+    diagnostico: diagnostico || ''[cite: 3]
   };
   
-  callScript(payload).then(() => {
-    closeNuevaConsultaInline();
-    loadConsultas(selectedPatient.documento);
-  }).catch(() => alert('Error al guardar la consulta.'));
-}
+  callScript(payload).then(() => {[cite: 3]
+    // -------------------------------------------------------------
+    // MODIFICACIÓN: Cambiar estado a 'ATTENDED' (Atendido) si tiene turno hoy
+    // -------------------------------------------------------------
+    if (turnosCache && turnosCache.length > 0 && selectedPatient) {[cite: 3]
+      const turnoPaciente = turnosCache.find(t => String(t.documento) === String(selectedPatient.documento));[cite: 3]
+      
+      if (turnoPaciente && (turnoPaciente.estado || '').toUpperCase() !== 'ATTENDED') {[cite: 3]
+        callScript({
+          action: 'actualizarEstadoTurno',[cite: 3]
+          idBooking: turnoPaciente.idBooking,[cite: 3]
+          estado: 'ATTENDED'[cite: 3]
+        }).then(() => {
+          turnoPaciente.estado = 'ATTENDED';[cite: 3]
+          if (typeof loadAgenda === 'function') {
+            loadAgenda(); // Refresca la agenda en segundo plano[cite: 3]
+          }
+        }).catch(err => console.error('Error al actualizar el estado del turno:', err));
+      }
+    }
+    // -------------------------------------------------------------
 
+    closeNuevaConsultaInline();[cite: 3]
+    loadConsultas(selectedPatient.documento);[cite: 3]
+  }).catch(() => alert('Error al guardar la consulta.'));[cite: 3]
+}
 function editarDatosPaciente() {
   const root = document.getElementById('modalRoot');
   
@@ -1062,6 +1106,21 @@ function resetMicButton() {
     btn.style.color = 'var(--accent)';
     btn.style.borderColor = 'var(--accent)';
   }
+}
+  function volverAgenda() {
+  // 1. Ocultar la ficha médica y restaurar la vista vacía inicial[cite: 2]
+  document.getElementById('fichaView').style.display = 'none';[cite: 2]
+  document.getElementById('emptyFicha').style.display = 'flex';[cite: 2]
+  
+  // 2. Limpiar el contenedor de consulta si estaba abierto
+  document.getElementById('inlineConsultaBox').innerHTML = '';
+
+  // 3. Deseleccionar al paciente actual y actualizar la lista lateral[cite: 2]
+  selectedPatient = null;[cite: 2]
+  renderSidebar();[cite: 2]
+  
+  // 4. Cambiar activamente a la pantalla de la Agenda
+  showScreen('agenda');[cite: 3]
 }
 
 // NUEVA FUNCIÓN CORREGIDA CON TUS FUNCIONES REALES (loadAgenda y loadPacientesList)
