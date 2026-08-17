@@ -268,6 +268,7 @@ const SCRIPT_URL = 'https://consultoriodradiaz.netlify.app/.netlify/functions/ap
 
 let allPatients = [], filteredPatients = [], selectedPatient = null, cacheConsultasActual = [];
 let turnosCache = [];
+let consultasRequestId = 0; // usado para descartar respuestas de historial que llegan fuera de orden
 
 const CIE10 = [
   {code:'E10',desc:'Diabetes mellitus tipo 1'},
@@ -345,7 +346,26 @@ function setTopbar() {
   tick(); setInterval(tick, 10000);
 }
 
-function callScript(params) { return fetch(SCRIPT_URL + '?' + new URLSearchParams(params)).then(r => r.json()); }
+// Acciones de solo lectura: si fallan por timeout/red, se puede reintentar una
+// vez sin riesgo. Las acciones de escritura (guardarConsulta, etc.) NUNCA se
+// reintentan automáticamente para no duplicar datos si el pedido original sí
+// llegó a procesarse y solo se perdió la respuesta.
+const ACCIONES_LECTURA = new Set(['getPacientes', 'getConsultas', 'getTurnosPorFecha', 'getTurnosHoy']);
+
+function callScript(params, _esReintento) {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 15000); // corta pedidos colgados a los 15s
+
+  return fetch(SCRIPT_URL + '?' + new URLSearchParams(params), { signal: controller.signal })
+    .then(r => { clearTimeout(timeoutId); return r.json(); })
+    .catch(err => {
+      clearTimeout(timeoutId);
+      if (ACCIONES_LECTURA.has(params.action) && !_esReintento) {
+        return callScript(params, true); // un reintento automático para lecturas
+      }
+      throw err;
+    });
+}
 
 function getTodayStr() { return new Date().toISOString().slice(0,10); }
 
@@ -449,14 +469,18 @@ function verFichaDesdeAgenda(doc, nombre) {
   else abrir();
 }
 
+let pacientesLoadPromise = null; // evita pedir la lista dos veces a la vez (ej: precarga + clic en la pestaña)
+
 function loadPacientes() {
-  return callScript({action:'getPacientes'}).then(data => {
+  if (pacientesLoadPromise) return pacientesLoadPromise;
+  pacientesLoadPromise = callScript({action:'getPacientes'}).then(data => {
     allPatients = Array.isArray(data) ? data : [];
     filteredPatients = [...allPatients];
     renderSidebar();
   }).catch(() => {
     document.getElementById('patientList').innerHTML = '<div style="padding:16px;font-size:13px;color:var(--text3);">Error al cargar.</div>';
-  });
+  }).finally(() => { pacientesLoadPromise = null; });
+  return pacientesLoadPromise;
 }
 
 function renderSidebar() {
@@ -477,7 +501,7 @@ function renderSidebar() {
 
 function filterPatients() {
   const q = document.getElementById('searchInput').value.toLowerCase();
-  filteredPatients = allPatients.filter(p => p.nombre.toLowerCase().includes(q) || String(p.documento).includes(q));
+  filteredPatients = allPatients.filter(p => (p.nombre||'').toLowerCase().includes(q) || String(p.documento||'').includes(q));
   renderSidebar();
 }
 
@@ -523,7 +547,18 @@ function selectPatient(p) {
 function loadConsultas(doc) {
   const box = document.getElementById('consultasBox');
   box.innerHTML = '<div class="loading-msg">⏳ Cargando historial clínico...</div>';
+
+  // Si el usuario hace clic en varios pacientes rápido, las respuestas del
+  // servidor pueden llegar en un orden distinto al que se pidieron. Sin este
+  // control, la respuesta más lenta de un paciente A podía pisar la ficha
+  // que ya estaba mostrando el paciente B ("a veces no aparece el historial").
+  const idPedido = ++consultasRequestId;
+  const docPedido = String(doc);
+
   callScript({action:'getConsultas', documento: doc}).then(data => {
+    if (idPedido !== consultasRequestId) return; // llegó una respuesta vieja: se descarta
+    if (!selectedPatient || String(selectedPatient.documento) !== docPedido) return; // cambió de paciente mientras tanto
+
     cacheConsultasActual = Array.isArray(data) ? data : [];
     if (!cacheConsultasActual.length) { box.innerHTML = '<div class="loading-msg">📋 No hay consultas registradas para este paciente.</div>'; return; }
     box.innerHTML = '';
@@ -540,7 +575,10 @@ function loadConsultas(doc) {
       `;
       box.appendChild(div);
     });
-  }).catch(() => { box.innerHTML = '<div class="loading-msg">⚠️ Error al cargar historial.</div>'; });
+  }).catch(() => {
+    if (idPedido !== consultasRequestId) return;
+    box.innerHTML = '<div class="loading-msg">⚠️ Error al cargar historial.</div>';
+  });
 }
 
 function copiarResumenFormal() {
@@ -1127,6 +1165,9 @@ function registrarEspontaneoEnBackend(paciente) {
 window.onload = () => {
   setTopbar();
   irAHoy();
+  // Precarga la lista de pacientes en segundo plano para que, al entrar a la
+  // pestaña "Pacientes", ya esté lista (antes había que esperar el pedido ahí).
+  loadPacientes();
 };
 </script>
 </body>
