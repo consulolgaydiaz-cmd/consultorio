@@ -314,6 +314,51 @@ const CIE10 = [
 
 function initials(n) { return n.split(' ').filter(Boolean).map(w=>w[0]).join('').slice(0,2).toUpperCase(); }
 
+// ============================================================
+// BORRADOR AUTOMÁTICO DE CONSULTA (autoguardado local)
+// ============================================================
+// Guarda lo que se va escribiendo en "Nueva Consulta" en el propio navegador,
+// para no perder nada si se cierra la ficha por error, se cambia de paciente
+// sin querer, o se refresca la página. Se borra solo cuando la consulta se
+// guarda con éxito en la planilla.
+let autosaveTimeout = null;
+
+function claveBorrador(documento) {
+  return `borrador_consulta_${documento}_${getTodayStr()}`;
+}
+
+function guardarBorrador() {
+  clearTimeout(autosaveTimeout);
+  autosaveTimeout = setTimeout(() => {
+    if (!selectedPatient) return;
+    const motivo = document.getElementById('c_motivo')?.value || '';
+    const evolucion = document.getElementById('c_evolucion')?.value || '';
+    const diagnostico = document.getElementById('c_cie')?.value || '';
+    // Si no hay nada escrito, no vale la pena guardar un borrador vacío
+    if (!motivo && !evolucion && !diagnostico) return;
+    try {
+      localStorage.setItem(claveBorrador(selectedPatient.documento), JSON.stringify({ motivo, evolucion, diagnostico, guardadoEn: Date.now() }));
+      const aviso = document.getElementById('avisoBorrador');
+      if (aviso) {
+        aviso.textContent = '💾 Borrador guardado automáticamente';
+        aviso.style.opacity = '1';
+        setTimeout(() => { if (aviso) aviso.style.opacity = '0.5'; }, 1200);
+      }
+    } catch(e) { /* localStorage lleno o bloqueado: no interrumpe el flujo normal */ }
+  }, 500); // espera 500ms de inactividad antes de guardar, para no escribir en cada tecla
+}
+
+function cargarBorrador(documento) {
+  try {
+    const raw = localStorage.getItem(claveBorrador(documento));
+    return raw ? JSON.parse(raw) : null;
+  } catch(e) { return null; }
+}
+
+function borrarBorrador(documento) {
+  try { localStorage.removeItem(claveBorrador(documento)); } catch(e) {}
+}
+
 function formatFecha(f) {
   if (!f) return '—';
   if (/^\d{2}\/\d{2}\/\d{4}$/.test(String(f))) return f;
@@ -652,7 +697,7 @@ function openNuevaConsultaInline() {
   container.innerHTML = `
     <div class="inline-consulta-container">
       <div class="modal-title" style="color: var(--accent-dark); font-size:16px; font-weight:600; display:flex; justify-content:space-between; align-items:center;">
-        <span>Nueva Consulta Médica</span>
+        <span>Nueva Consulta Médica <span id="avisoBorrador" style="font-size:11px;font-weight:400;color:var(--text3);opacity:0.5;margin-left:8px;"></span></span>
         <button onclick="closeNuevaConsultaInline()" style="background:transparent; border:none; font-size:18px; cursor:pointer; color:var(--text3);">✕</button>
       </div>
       
@@ -666,19 +711,19 @@ function openNuevaConsultaInline() {
       <div id="consultaTabEvol" class="tab-content active">
         <div class="form-group">
           <label class="form-label">Motivo de Consulta</label>
-          <input type="text" id="c_motivo" class="form-input" placeholder="Ej. Control de evolución">
+          <input type="text" id="c_motivo" class="form-input" placeholder="Ej. Control de evolución" oninput="guardarBorrador()">
         </div>
         <div class="form-group">
           <label class="form-label" style="display:flex; justify-content:space-between; align-items:center;">
             Evolución Clínica
             <button type="button" id="btnMicEvolucion" onclick="toggleDictation()" style="background:var(--accent-light); border:1px solid var(--accent); border-radius:var(--radius-sm); padding:4px 10px; cursor:pointer; font-size:12px; font-family:'DM Sans',sans-serif; font-weight:500; color:var(--accent);" title="Dictar por voz">🎤 Activar Micrófono</button>
           </label>
-          <textarea id="c_evolucion" class="form-input" style="min-height:180px;" placeholder="Escribí o dictá la anamnesis o examen clínico aquí..."></textarea>
+          <textarea id="c_evolucion" class="form-input" style="min-height:180px;" placeholder="Escribí o dictá la anamnesis o examen clínico aquí..." oninput="guardarBorrador()"></textarea>
         </div>
         <div class="form-group">
           <label class="form-label">Diagnóstico (CIE-10)</label>
           <div class="cie-wrap">
-            <input type="text" id="c_cie" class="form-input" placeholder="Buscar código o enfermedad..." oninput="searchCIE(this.value)">
+            <input type="text" id="c_cie" class="form-input" placeholder="Buscar código o enfermedad..." oninput="searchCIE(this.value); guardarBorrador();">
             <div id="cieResults" class="cie-results" style="display:none;"></div>
           </div>
         </div>
@@ -793,7 +838,35 @@ function openNuevaConsultaInline() {
       }
     } catch(e){}
   }
+
+  // Si había un borrador autoguardado de este paciente para hoy, lo restaura
+  if (selectedPatient) {
+    const borrador = cargarBorrador(selectedPatient.documento);
+    if (borrador) {
+      if (borrador.motivo) document.getElementById('c_motivo').value = borrador.motivo;
+      if (borrador.evolucion) document.getElementById('c_evolucion').value = borrador.evolucion;
+      if (borrador.diagnostico) document.getElementById('c_cie').value = borrador.diagnostico;
+      const aviso = document.getElementById('avisoBorrador');
+      if (aviso) {
+        aviso.style.opacity = '1';
+        aviso.innerHTML = `↩️ Se restauró un borrador guardado automáticamente · <a href="#" onclick="descartarBorradorActual(event)" style="color:var(--accent);">descartar</a>`;
+      }
+    }
+  }
+
   container.scrollIntoView({ behavior: 'smooth' });
+}
+
+function descartarBorradorActual(ev) {
+  if (ev) ev.preventDefault();
+  if (!selectedPatient) return;
+  if (!confirm('¿Descartar el borrador guardado y vaciar el formulario?')) return;
+  borrarBorrador(selectedPatient.documento);
+  document.getElementById('c_motivo').value = '';
+  document.getElementById('c_evolucion').value = '';
+  document.getElementById('c_cie').value = '';
+  const aviso = document.getElementById('avisoBorrador');
+  if (aviso) { aviso.textContent = ''; }
 }
 
 function closeNuevaConsultaInline() { document.getElementById('inlineConsultaBox').innerHTML = ''; }
@@ -805,6 +878,9 @@ function switchConsultaTab(tab) {
   document.getElementById('consultaTabEvol').classList.toggle('active', tab==='Evol');
   document.getElementById('consultaTabLabs').classList.toggle('active', tab==='Labs');
   document.getElementById('consultaTabScores').classList.toggle('active', tab==='Scores');
+  // Los botones "Agregar a Evolución" (labs y scores) escriben en el textarea
+  // por JS y vuelven a esta pestaña; esto asegura que quede autoguardado.
+  if (tab === 'Evol') guardarBorrador();
 }
 
 function agregarLaboratorioAEvolucion() {
@@ -956,7 +1032,7 @@ function searchCIE(q) {
   matched.forEach(x => {
     const d = document.createElement('div'); d.className = 'cie-item';
     d.innerHTML = `<span class="cie-code">${x.code}</span> ${x.desc}`;
-    d.onclick = () => { document.getElementById('c_cie').value = `${x.code} - ${x.desc}`; resBox.style.display='none'; };
+    d.onclick = () => { document.getElementById('c_cie').value = `${x.code} - ${x.desc}`; resBox.style.display='none'; guardarBorrador(); };
     resBox.appendChild(d);
   });
   resBox.style.display='block';
@@ -995,9 +1071,10 @@ function guardarConsultaInline() {
       }
     }
 
+    borrarBorrador(selectedPatient.documento); // ya se guardó en la planilla: el borrador local ya no hace falta
     closeNuevaConsultaInline();
     loadConsultas(selectedPatient.documento);
-  }).catch(() => alert('Error al guardar la consulta.'));
+  }).catch(() => alert('Error al guardar la consulta. El borrador se mantiene guardado localmente, podés reintentar sin perder lo escrito.'));
 }
 
 function editarDatosPaciente() {
@@ -1104,6 +1181,7 @@ function toggleDictation() {
       const currentText = textarea.value;
       const needsSpace = currentText.length > 0 && !currentText.endsWith(' ') && !currentText.endsWith('\n');
       textarea.value += (needsSpace ? ' ' : '') + finalTranscript;
+      guardarBorrador(); // el dictado escribe el .value por JS y no dispara "oninput" solo
     }
   };
 
