@@ -398,15 +398,23 @@ function setTopbar() {
 const ACCIONES_LECTURA = new Set(['getPacientes', 'getConsultas', 'getTurnosPorFecha', 'getTurnosHoy']);
 
 function callScript(params, _esReintento) {
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 15000); // corta pedidos colgados a los 15s
+  const esLectura = ACCIONES_LECTURA.has(params.action);
 
-  return fetch(SCRIPT_URL + '?' + new URLSearchParams(params), { signal: controller.signal })
-    .then(r => { clearTimeout(timeoutId); return r.json(); })
+  // El límite de tiempo (y el reintento) solo aplican a LECTURAS: si una
+  // lectura se corta, no pasa nada, se reintenta sola. Un GUARDADO en
+  // cambio no debe cortarse nunca del lado del navegador: aunque tarde,
+  // Apps Script puede haber completado la escritura en la planilla antes
+  // de terminar de responder, y cortar acá generaría un "error" falso
+  // sobre un guardado que en realidad sí se hizo.
+  const controller = esLectura ? new AbortController() : null;
+  const timeoutId = controller ? setTimeout(() => controller.abort(), 15000) : null;
+
+  return fetch(SCRIPT_URL + '?' + new URLSearchParams(params), controller ? { signal: controller.signal } : {})
+    .then(r => { if (timeoutId) clearTimeout(timeoutId); return r.json(); })
     .catch(err => {
-      clearTimeout(timeoutId);
-      if (ACCIONES_LECTURA.has(params.action) && !_esReintento) {
-        return callScript(params, true); // un reintento automático para lecturas
+      if (timeoutId) clearTimeout(timeoutId);
+      if (esLectura && !_esReintento) {
+        return callScript(params, true); // un reintento automático solo para lecturas
       }
       throw err;
     });
@@ -1053,7 +1061,15 @@ function guardarConsultaInline() {
     diagnostico: diagnostico || ''
   };
   
-  callScript(payload).then(() => {
+  callScript(payload).then((resultado) => {
+    if (resultado && resultado.ok === false) {
+      // El backend respondió pero indicó que NO pudo guardar (ej: no encontró
+      // al paciente). Acá sí es un fallo real, informado explícitamente por
+      // Apps Script, no un simple corte de conexión.
+      alert('No se pudo guardar la consulta: ' + (resultado.msg || 'motivo desconocido') + '\nEl borrador se mantiene guardado localmente, podés reintentar sin perder lo escrito.');
+      return;
+    }
+
     if (turnosCache && turnosCache.length > 0 && selectedPatient) {
       const turnoPaciente = turnosCache.find(t => String(t.documento) === String(selectedPatient.documento));
       
