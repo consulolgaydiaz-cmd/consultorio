@@ -359,21 +359,40 @@ function borrarBorrador(documento) {
   try { localStorage.removeItem(claveBorrador(documento)); } catch(e) {}
 }
 
+// Parser de fechas robusto: entiende tanto "DD/MM/AAAA" (formato argentino,
+// como queda guardado a veces tras una edición) como fechas ISO ("AAAA-MM-DD"
+// o con hora, como las devuelve Apps Script desde una celda de tipo Fecha).
+// El `new Date(...)` nativo de JS interpreta "13/01/1952" como MES/DÍA/AÑO
+// (mes 13 no existe) y devuelve una fecha inválida sin avisar — por eso la
+// edad desaparecía en silencio para días de nacimiento del 13 al 31.
+function parsearFechaFlexible(f) {
+  if (!f) return null;
+  if (f instanceof Date) return isNaN(f.getTime()) ? null : f;
+
+  const s = String(f).trim();
+  const matchDMY = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+  if (matchDMY) {
+    const [, d, m, a] = matchDMY;
+    const fecha = new Date(Number(a), Number(m) - 1, Number(d));
+    return isNaN(fecha.getTime()) ? null : fecha;
+  }
+
+  const fecha = new Date(s);
+  return isNaN(fecha.getTime()) ? null : fecha;
+}
+
 function formatFecha(f) {
   if (!f) return '—';
   if (/^\d{2}\/\d{2}\/\d{4}$/.test(String(f))) return f;
-  try {
-    const d = new Date(f);
-    if (isNaN(d.getTime())) return String(f);
-    return `${String(d.getUTCDate()).padStart(2,'0')}/${String(d.getUTCMonth()+1).padStart(2,'0')}/${d.getUTCFullYear()}`;
-  } catch(e) { return String(f); }
+  const d = parsearFechaFlexible(f);
+  if (!d) return String(f);
+  return `${String(d.getUTCDate()).padStart(2,'0')}/${String(d.getUTCMonth()+1).padStart(2,'0')}/${d.getUTCFullYear()}`;
 }
 
 function calcularEdad(fechaNacimiento) {
-  if (!fechaNacimiento) return '';
+  const nac = parsearFechaFlexible(fechaNacimiento);
+  if (!nac) return '';
   const hoy = new Date();
-  const nac = new Date(fechaNacimiento);
-  if (isNaN(nac.getTime())) return '';
   let edad = hoy.getFullYear() - nac.getFullYear();
   const m = hoy.getMonth() - nac.getMonth();
   if (m < 0 || (m === 0 && hoy.getDate() < nac.getDate())) {
@@ -837,14 +856,13 @@ function openNuevaConsultaInline() {
   `;
   
   if(selectedPatient && selectedPatient.fechaNacimiento) {
-    try {
-      const edad = new Date().getFullYear() - new Date(selectedPatient.fechaNacimiento).getFullYear();
-      if(!isNaN(edad)) {
-        setTimeout(() => {
-          if(document.getElementById('sc_tfg_edad')) document.getElementById('sc_tfg_edad').value = edad;
-        }, 100);
-      }
-    } catch(e){}
+    const nacTFG = parsearFechaFlexible(selectedPatient.fechaNacimiento);
+    if (nacTFG) {
+      const edad = new Date().getFullYear() - nacTFG.getFullYear();
+      setTimeout(() => {
+        if(document.getElementById('sc_tfg_edad')) document.getElementById('sc_tfg_edad').value = edad;
+      }, 100);
+    }
   }
 
   // Si había un borrador autoguardado de este paciente para hoy, lo restaura
@@ -1098,9 +1116,11 @@ function editarDatosPaciente() {
   
   let fechaFormateada = '';
   if (selectedPatient.fechaNacimiento) {
-    const d = new Date(selectedPatient.fechaNacimiento);
-    if (!isNaN(d.getTime())) {
-      fechaFormateada = d.toISOString().split('T')[0];
+    const d = parsearFechaFlexible(selectedPatient.fechaNacimiento);
+    if (d) {
+      // Construye el string "AAAA-MM-DD" a partir de los componentes locales
+      // (no toISOString, que convierte a UTC y puede correr el día).
+      fechaFormateada = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
     }
   }
 
