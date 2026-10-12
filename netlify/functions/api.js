@@ -6,25 +6,35 @@ const CORS_HEADERS = {
 };
 
 exports.handler = async (event) => {
-  const params = event.queryStringParameters;
-  const url = SCRIPT_URL + '?' + new URLSearchParams(params);
+  const method = event.httpMethod;
+  let url = SCRIPT_URL;
+  let options = {
+    method: method,
+    redirect: 'follow',
+    headers: {
+      'User-Agent': 'Mozilla/5.0',
+      'Content-Type': 'application/json'
+    }
+  };
 
-  // Corta el pedido a los 20s en vez de dejarlo colgado hasta que Netlify
-  // mate la función por su cuenta (eso generaba fallos "sin motivo aparente").
+  if (method === 'GET') {
+    const params = event.queryStringParameters || {};
+    if (Object.keys(params).length > 0) {
+      url += '?' + new URLSearchParams(params);
+    }
+  } else if (method === 'POST') {
+    options.body = event.body;
+  }
+
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), 20000);
+  options.signal = controller.signal;
 
   try {
-    const res = await fetch(url, {
-      redirect: 'follow',
-      signal: controller.signal,
-      headers: {
-        'User-Agent': 'Mozilla/5.0'
-      }
-    });
+    const res = await fetch(url, options);
     clearTimeout(timeoutId);
     const text = await res.text();
-    JSON.parse(text); // validar que es JSON
+    
     return {
       statusCode: 200,
       headers: CORS_HEADERS,
@@ -35,7 +45,7 @@ exports.handler = async (event) => {
     const esTimeout = e.name === 'AbortError';
     return {
       statusCode: esTimeout ? 504 : 502,
-      headers: CORS_HEADERS, // sin esto el navegador bloquea la lectura del error por CORS
+      headers: CORS_HEADERS,
       body: JSON.stringify({ error: esTimeout ? 'Timeout esperando respuesta del backend' : e.toString() })
     };
   }
