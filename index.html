@@ -419,26 +419,28 @@ const ACCIONES_LECTURA = new Set(['getPacientes', 'getConsultas', 'getTurnosPorF
 function callScript(params, _esReintento) {
   const esLectura = ACCIONES_LECTURA.has(params.action);
 
-  // El límite de tiempo (y el reintento) solo aplican a LECTURAS: si una
-  // lectura se corta, no pasa nada, se reintenta sola. Un GUARDADO en
-  // cambio no debe cortarse nunca del lado del navegador: aunque tarde,
-  // Apps Script puede haber completado la escritura en la planilla antes
-  // de terminar de responder, y cortar acá generaría un "error" falso
-  // sobre un guardado que en realidad sí se hizo.
-  const controller = esLectura ? new AbortController() : null;
-  const timeoutId = controller ? setTimeout(() => controller.abort(), 15000) : null;
-
-  return fetch(SCRIPT_URL + '?' + new URLSearchParams(params), controller ? { signal: controller.signal } : {})
-    .then(r => { if (timeoutId) clearTimeout(timeoutId); return r.json(); })
-    .catch(err => {
-      if (timeoutId) clearTimeout(timeoutId);
-      if (esLectura && !_esReintento) {
-        return callScript(params, true); // un reintento automático solo para lecturas
-      }
-      throw err;
-    });
+  if (esLectura) {
+    // Peticiones de lectura (GET con parámetros en URL)
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 15000);
+    return fetch(SCRIPT_URL + '?' + new URLSearchParams(params), { signal: controller.signal })
+      .then(r => { clearTimeout(timeoutId); return r.json(); })
+      .catch(err => {
+        clearTimeout(timeoutId);
+        if (!_esReintento) return callScript(params, true);
+        throw err;
+      });
+  } else {
+    // Peticiones de escritura/modificación (POST con cuerpo JSON para doPost)
+    return fetch(SCRIPT_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(params)
+    })
+    .then(r => r.json());
+  }
 }
-
+  
 function getTodayStr() { return new Date().toISOString().slice(0,10); }
 
 function irAHoy() { document.getElementById('fechaAgenda').value = getTodayStr(); loadAgenda(); }
